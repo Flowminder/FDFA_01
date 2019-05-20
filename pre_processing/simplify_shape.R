@@ -15,6 +15,7 @@ all_admin_s=rmapshaper::ms_simplify(all_admin_GRASS_simple,
                                     keep=0.1)
 
 print(object.size(all_admin),units = "auto") # from 243 Mb to 
+print(object.size(all_admin_GRASS_simple),units = "auto") # 30.5 Mb
 print(object.size(all_admin_s),units = "auto") # 30.5 Mb
 
 # check no ISO_NODE has been lost ####
