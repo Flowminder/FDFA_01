@@ -1,30 +1,56 @@
 rm(list=ls())
-library(dplyr)
-library(RPostgreSQL)
-library(leaflet)
+library(rmapshaper)
+library(sp)
+library(geojsonio)
 # set the directory ####
 setwd("C:/Users/Xavier Vollenweider/Dropbox/FDFA_01/data/")
 
 # load the data ####
 all_admin=rgdal::readOGR("spatial/All_AdminUnits_final/ALL_AdminUnits_final.shp")
 
-all_admin_GRASS_simple=rgdal::readOGR("spatial/All_AdminUnits_final_simplified/ALL_AdminUnits_final_GRASS_simple.shp") # data created with GRASS-> v.generalize.simplify
+# Convert to json ####
+all_admin_json <- geojson_json(all_admin,
+                               group = "ISO_NODE", 
+                               geometry = "polygon")
+# Simplify the shape ####
+check_sys_mapshaper()
+# If you get an error, you will need to install mapshaper. First install node (https://nodejs.org/en/) and then install mapshaper with:
+#   npm install -g mapshaper
 
-# simplify shape for faster map rendering ####
-all_admin_s=rmapshaper::ms_simplify(all_admin_GRASS_simple,
-                                    keep=0.1)
+# keep all the 2,198 poly with 0.03
+all_admin_03=ms_simplify(all_admin_json,
+                         keep=0.03,
+                         sys=T)
+print(object.size(all_admin_03),units = "auto") # 5.2Mb
 
-print(object.size(all_admin),units = "auto") # from 243 Mb to 
-print(object.size(all_admin_GRASS_simple),units = "auto") # 30.5 Mb
-print(object.size(all_admin_s),units = "auto") # 30.5 Mb
+# keep only 2187 poly out of 2,198 with 0.005
+all_admin_005=ms_simplify(all_admin_json,
+                          keep=0.005,
+                          sys=T)
+print(object.size(all_admin_005),units = "auto") # 22.3Mb
 
-# check no ISO_NODE has been lost ####
-length(unique(all_admin$ISO_NODE))
-length(unique(all_admin_s$ISO_NODE))
+# backtransform from json to sp ####
+all_admin_005_sp=geojson_sp(all_admin_005)
+print(object.size(all_admin_005_sp),units = "auto") # 9.7Mb
 
-# write as GeoJSON ####
-rgdal::ogrDrivers()
-rgdal::writeOGR(all_admin_s,
-                "spatial/All_AdminUnits_final_simplified/ALL_AdminUnits_final_light.geojson",
+all_admin_03_sp=geojson_sp(all_admin_03)
+print(object.size(all_admin_03_sp),units = "auto") # 21.2 Mb
+
+# identify missing poly ####
+remaining_ISO=unique(all_admin_005_sp$ISO_NODE)
+original_ISO=unique(all_admin_03_sp$ISO_NODE)
+missing_ISO=which(!(original_ISO%in%remaining_ISO))
+
+
+# extract missing poly all_admin_03_sp and add them in all_admin_005_sp #### 
+all_admin_missing=all_admin_03_sp[missing_ISO,]
+all_admin_simplified=rbind(all_admin_missing,
+                           all_admin_005_sp)
+
+print(object.size(all_admin_simplified),units = "auto") # 9.9Mb
+
+# write to a geojson file #### 
+rgdal::writeOGR(all_admin_simplified,
+                "spatial/All_AdminUnits_final_simplified//all_admin_simplified.geojson",
                 driver = "GeoJSON",
                 layer=1)
