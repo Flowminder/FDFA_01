@@ -51,6 +51,6 @@ print(object.size(all_admin_simplified),units = "auto") # 9.9Mb
 
 # write to a geojson file #### 
 rgdal::writeOGR(all_admin_simplified,
-                "spatial/All_AdminUnits_final_simplified//all_admin_simplified.geojson",
+                "spatial/All_AdminUnits_final_simplified/all_admin_simplified.geojson",
                 driver = "GeoJSON",
                 layer=1)
