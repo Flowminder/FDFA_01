@@ -39,8 +39,34 @@ IM_data=table_gender_mig%>%
   select(ISO_NODEJ,total,females,males,females_perc,males_perc)%>%
   rename("ISO_NODE"="ISO_NODEJ")
 
-# Net Migratoin movements per admin unit ####
-Net_MIG=IM_data%>%
+# Net immigration movements per admin unit ####
+Net_IM=IM_data%>%
+  select(ISO_NODE,total,females,males)%>%
+  left_join(EM_data%>%
+              rename("total_EM"="total",
+                     "females_EM"="females",
+                     "males_EM"="males"),
+            by=c("ISO_NODE"))%>%
+  mutate(net_IM=total-total_EM,
+         net_IM_females=females-females_EM,
+         net_IM_males=males-males_EM)%>%
+  select(ISO_NODE,net_IM,net_IM_females,net_IM_males)
+
+# Net emigration movements per admin unit ####
+Net_EM=IM_data%>%
+  select(ISO_NODE,total,females,males)%>%
+  left_join(EM_data%>%
+              rename("total_EM"="total",
+                     "females_EM"="females",
+                     "males_EM"="males"),
+            by=c("ISO_NODE"))%>%
+  mutate(net_EM=total_EM-total,
+          net_EM_females=females_EM-females,
+          net_EM_males=males_EM-males)%>%
+  select(ISO_NODE,net_EM,net_EM_females,net_EM_males)
+
+# Total emigration movements per admin unit ####
+EM_IM=IM_data%>%
   select(ISO_NODE,total,females,males)%>%
   left_join(EM_data%>%
               rename("total_EM"="total",
@@ -49,18 +75,13 @@ Net_MIG=IM_data%>%
             by=c("ISO_NODE"))%>%
   mutate(EM_IM=total+total_EM,
          EM_IM_females=females+females_EM,
-         EM_IM_males=males+males_EM,
-         net_IM=total-total_EM,
-         net_EM=total_EM-total,
-         net_IM_females=females-females_EM,
-         net_EM_females=females_EM-females,
-         net_IM_males=males-males_EM,
-         net_EM_males=males_EM-males)%>%
-  select(ISO_NODE,net_IM,net_EM,net_IM,net_IM_females,net_EM_females,net_IM_males,net_EM_males,EM_IM,EM_IM_females,EM_IM_males)
+         EM_IM_males=males+males_EM)%>%
+  select(ISO_NODE,EM_IM,EM_IM_females,EM_IM_males)
 
 # add the tables in a SQLITE database ####
 mig_db <- src_sqlite("table/mig_db.sqlite3",
                      create = T)
+
 copy_to(mig_db,
         EM_data,
         name="EM",
@@ -76,8 +97,22 @@ copy_to(mig_db,
         overwrite = T)
 
 copy_to(mig_db,
-        Net_MIG,
-        name = "Net",
+        Net_IM,
+        name = "Net_IM",
+        temporary = FALSE,
+        indexes = list("ISO_NODE"),
+        overwrite = T)
+
+copy_to(mig_db,
+        Net_EM,
+        name = "Net_EM",
+        temporary = FALSE,
+        indexes = list("ISO_NODE"),
+        overwrite = T)
+
+copy_to(mig_db,
+        EM_IM,
+        name = "EM_IM",
         temporary = FALSE,
         indexes = list("ISO_NODE"),
         overwrite = T)
