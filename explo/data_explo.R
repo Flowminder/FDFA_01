@@ -93,6 +93,7 @@ data_to_plot=all_admin_light
 data_to_plot@data=collect(admin_sq%>%
                                   left_join(EM_sq,
                                             by=c("ISO_NODE")))
+
 leaflet(data_to_plot)%>%
   addPolygons(weight=1,
               color = "#444444",
