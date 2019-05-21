@@ -49,8 +49,15 @@ Net_IM=IM_data%>%
             by=c("ISO_NODE"))%>%
   mutate(net_IM=total-total_EM,
          net_IM_females=females-females_EM,
-         net_IM_males=males-males_EM)%>%
-  select(ISO_NODE,net_IM,net_IM_females,net_IM_males)
+         net_IM_males=males-males_EM,
+         females_perc=net_IM_females/net_IM,
+         males_perc=net_IM_males/net_IM)%>%
+  mutate(females_perc=ifelse(is.infinite(females_perc),0,females_perc),
+         males_perc=ifelse(is.infinite(males_perc),0,males_perc))%>%
+  select(ISO_NODE,net_IM,net_IM_females,net_IM_males,females_perc,males_perc)%>%
+  rename("total"="net_IM",
+         "females"="net_IM_females",
+         "males"="net_IM_males")
 
 # Net emigration movements per admin unit ####
 Net_EM=IM_data%>%
@@ -62,8 +69,15 @@ Net_EM=IM_data%>%
             by=c("ISO_NODE"))%>%
   mutate(net_EM=total_EM-total,
           net_EM_females=females_EM-females,
-          net_EM_males=males_EM-males)%>%
-  select(ISO_NODE,net_EM,net_EM_females,net_EM_males)
+          net_EM_males=males_EM-males,
+          females_perc=net_EM_females/net_EM,
+         males_perc=net_EM_males/net_EM)%>%
+  mutate(females_perc=ifelse(is.infinite(females_perc),0,females_perc),
+         males_perc=ifelse(is.infinite(males_perc),0,males_perc))%>%
+  select(ISO_NODE,net_EM,net_EM_females,net_EM_males,females_perc,males_perc)%>%
+  rename("total"="net_EM",
+         "females"="net_EM_females",
+         "males"="net_EM_males")
 
 # Total emigration movements per admin unit ####
 EM_IM=IM_data%>%
@@ -75,8 +89,13 @@ EM_IM=IM_data%>%
             by=c("ISO_NODE"))%>%
   mutate(EM_IM=total+total_EM,
          EM_IM_females=females+females_EM,
-         EM_IM_males=males+males_EM)%>%
-  select(ISO_NODE,EM_IM,EM_IM_females,EM_IM_males)
+         EM_IM_males=males+males_EM,
+         females_perc=EM_IM_females/EM_IM,
+         males_perc=EM_IM_males/EM_IM)%>%
+  select(ISO_NODE,EM_IM,EM_IM_females,EM_IM_males,females_perc,males_perc)%>%
+  rename("total"="EM_IM",
+         "females"="EM_IM_females",
+         "males"="EM_IM_males")
 
 # add the tables in a SQLITE database ####
 mig_db <- src_sqlite("table/mig_db.sqlite3",
