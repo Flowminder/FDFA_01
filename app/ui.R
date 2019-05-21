@@ -17,7 +17,7 @@ ui <- shinyUI(navbarPage("Gender-disaggregated Migration Movements",
                                                          class = "panel panel-default",
                                                          id="PANEL",
                                                          
-                                                         selectInput("direction", 
+                                                         selectInput("movements", 
                                                                      label = "Movements",
                                                                      choices = c("Total migration"="total_migration",
                                                                                  "Internal Emigration"="emigration",
@@ -32,7 +32,14 @@ ui <- shinyUI(navbarPage("Gender-disaggregated Migration Movements",
                                                                                  "Males"="males",
                                                                                  "Females as percent of total"="females_perc",
                                                                                  "Males as percent of total"="males_perc"),
-                                                                     selected = "total")
+                                                                     selected = "total"),
+                                                         
+                                                         selectInput("metric", 
+                                                                     label="Metric",
+                                                                     choices = c("Number of people"="number",
+                                                                                 "Proportion of population"="prop_pop"),
+                                                                     selected = "number"),
+                                                         
                                                          
                                                          checkboxInput("destination",
                                                                        "Destination",
@@ -44,14 +51,8 @@ ui <- shinyUI(navbarPage("Gender-disaggregated Migration Movements",
                                                                                  "Destination"="destination",
                                                                                  "Net departure"="net_departure",
                                                                                  "Net arrival"="net_arrival"),
-                                                                     selected = "origin"),
-                                                         
-                                                         selectInput("metric", 
-                                                                     label="Metric",
-                                                                     choices = c("Number of people"="number",
-                                                                                 "Proportion of destination"="prop_destination",
-                                                                                 "Proportion of origin"="prop_origin"),
-                                                                     selected = "number"))
+                                                                     selected = "origin")
+                                           )
                                            
                                     )
                                   )
