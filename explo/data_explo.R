@@ -84,3 +84,19 @@ leaflet(data_to_plot)%>%
             labels = ~MIGIJ_F_est,
             opacity = 1)
 
+# Total Emigration movement per admin unit from the SQLite db ####
+mig_db = src_sqlite("table/mig_db.sqlite3")
+EM_sq =tbl(mig_db, "EM")
+admin_sq =tbl(mig_db, "admin")
+
+data_to_plot=all_admin_light
+data_to_plot@data=collect(admin_sq%>%
+                                  left_join(EM_sq,
+                                            by=c("ISO_NODE")))
+leaflet(data_to_plot)%>%
+  addPolygons(weight=1,
+              color = "#444444",
+              smoothFactor = 1,
+              fillOpacity = 1,
+              fillColor = ~colorQuantile("Greens", total)(total),
+              popup = ~total)
