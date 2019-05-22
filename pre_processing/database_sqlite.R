@@ -143,7 +143,9 @@ table_gender_mig_s=table_gender_mig%>%
   select(MIGIJ_F_est,MIGIJ_M_est,ISO_NODEI,ISO_NODEJ,CONTI,ISOI)%>%
   rename("females"="MIGIJ_F_est",
          "males"="MIGIJ_M_est")%>%
-  mutate(total=females+males)
+  mutate(total=females+males,
+         females_perc=females/total,
+         males_perc=males/total)
 
 
 copy_to(mig_db,
