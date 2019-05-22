@@ -115,42 +115,4 @@ server <- shinyServer(function(input, output, session) {
     return(p)
   })
   
-  
-  # # Map destination ###
-  # observeEvent(input$map_shape_click,{
-  #   event <- input$map_shape_click
-  #   
-  #   print(event)
-  #   
-  # })
-  # 
-  
-  
-  
-  # # get event ####
-  # observeEvent(input$map_shape_click,{
-  #   event <- input$map_shape_click
-  #   print(event)
-  #   if(is.null(event)){
-  #     event<-data.frame("lng"=-58.50,
-  #                       "lat"=-34.60)
-  #   }
-  #   
-  #   coord_select<-data.frame("lon"=event$lng,
-  #                            "lat"=event$lat)
-  #   
-  #   coordinates(coord_select)<-c("lon","lat")
-  #   proj4string(coord_select) <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
-  #   
-  #   
-  #   selected_adm<-sp::over(coord_select,
-  #                          admin_poly)
-  #   
-  #   selected_adm<-c(as.character(selected_adm$ISO_NODE))
-  #   
-  #   
-  #   print(selected_adm)
-  #   
-  #   #return(selected_adm)
-  # })
 })
