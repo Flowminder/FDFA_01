@@ -1,12 +1,15 @@
 library(shiny)
 library(dplyr)
 library(leaflet)
+library(leaflet.extras)
+library(rlang)
+
 rm(list = ls())
 
 # set the directories ####
 setwd("C:/Users/Xavier Vollenweider/Dropbox/FDFA_01/data/")
 code_dir="C:/Users/Xavier Vollenweider/Documents/Flowminder/Migration_FDFA/code/FDFA_01/app/"
-  
+
 # load the shapefile ####
 admin_poly=rgdal::readOGR("spatial/All_AdminUnits_final_simplified/all_admin_simplified.geojson")
 
@@ -29,3 +32,4 @@ source(paste0(code_dir,
 source(paste0(code_dir,
               "server.R"))
 shinyApp(ui, server)
+
