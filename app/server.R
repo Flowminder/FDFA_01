@@ -12,27 +12,64 @@ server <- shinyServer(function(input, output, session) {
       addTiles()
   })
   
-  # data_to_map ####
-  data_to_map=reactive({
-    con_selected=switch(input$movements, 
+  # data_to_map_tm ####
+  data_to_map_tm=reactive({
+    con_selected=switch(input$direction, 
                         "emigration" = EM,
                         "immigration" = IM,
                         "net_immigration" = Net_IM,
                         "net_emigration" = Net_EM,
                         "total_migration"=EM_IM)
     
-    data_to_map=admin_poly
-    data_to_map@data=collect(admin%>%
-                               left_join(con_selected,
-                                         by=c("ISO_NODE")))
+    data_to_map_tm=admin_poly
+    data_to_map_tm@data=collect(admin%>%
+                                  left_join(con_selected,
+                                            by=c("ISO_NODE")))
     
-    return(data_to_map)
+    return(data_to_map_tm)
   })
   
-  # Map labels ####
-  labels=reactive({ 
+  # data_to_map_origin_dest ####
+  data_to_map_od=reactive({
+    ISO_NODE=switch(input$direction,  
+                    "emigration" = "ISO_NODEI",
+                    "immigration" = "ISO_NODEJ",
+                    "net_immigration" = c("ISO_NODEI","ISO_NODEJ"),
+                    "net_emigration" = c("ISO_NODEJ","ISO_NODEI"),
+                    "total_migration"=c("ISO_NODEI","ISO_NODEJ"))
     
-    data_to_map_collected=data_to_map()
+    event <- input$map_shape_click
+      if(is.null(event)){
+        event<-data.frame("id"=55)
+      }
+    
+    layerID_selected=event$id
+    
+    ISO_NODE_clicked=admin_poly$ISO_NODE[layerID_selected]
+    
+  
+    
+    admin_data=gender_mig%>%
+      filter((!!sym(ISO_NODE))==ISO_NODE_clicked)%>%
+      select(females,males,total,females_perc,males_perc,ISO_NODEI,ISO_NODEJ)
+    
+    
+    data_to_map_od=admin_poly
+    
+    data_to_map_od@data=admin%>%
+      left_join(admin_data,
+                by=c("ISO_NODE"=ISO_NODE))%>%
+      collect()
+    
+    return(data_to_map_od)
+  })
+  
+  # labels ####
+  labels=reactive({
+    
+    data_to_map_collected=switch(input$movement,
+                                 "movements"=data_to_map_tm(),
+                                 "origin_destination"=data_to_map_od())
     
     field_to_map=input$gender
     
@@ -42,8 +79,8 @@ server <- shinyServer(function(input, output, session) {
       unlist(data_to_map_collected@data[,"CONT"]),
       
       formatC(unlist(data_to_map_collected@data[,field_to_map]),
-              format="f", 
-              digits=0, 
+              format="f",
+              digits=0,
               big.mark="'")
     ) %>% lapply(htmltools::HTML)
     
@@ -51,9 +88,12 @@ server <- shinyServer(function(input, output, session) {
     
   })
   
+  
   # Map ####
   observe({
-    data_to_map_collected=data_to_map()
+    data_to_map_collected=switch(input$movement,
+           "movements"=data_to_map_tm(),
+           "origin_destination"=data_to_map_od())
     
     field_to_map=input$gender
     
@@ -75,36 +115,42 @@ server <- shinyServer(function(input, output, session) {
     return(p)
   })
   
-  # Admin_clic ####
-  # observeEvent(input$map_click,{
-  #   print("hh")
-  #   event <- input$map_click
-  #   print(event)
-  # })
   
-  observeEvent(input$map_shape_click,{
-    event <- input$map_shape_click
-    print(event)
-    if(is.null(event)){
-      event<-data.frame("lng"=-58.50,
-                        "lat"=-34.60)
-    }
-    
-    coord_select<-data.frame("lon"=event$lng,
-                             "lat"=event$lat)
-    
-    coordinates(coord_select)<-c("lon","lat")
-    proj4string(coord_select) <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
-    
-    
-    selected_adm<-sp::over(coord_select,
-                           admin_poly)
-    
-    selected_adm<-c(as.character(selected_adm$ISO_NODE))
-    
-    
-    print(selected_adm)
-    
-    #return(selected_adm)
-  })
+  # # Map destination ###
+  # observeEvent(input$map_shape_click,{
+  #   event <- input$map_shape_click
+  #   
+  #   print(event)
+  #   
+  # })
+  # 
+  
+  
+  
+  # # get event ####
+  # observeEvent(input$map_shape_click,{
+  #   event <- input$map_shape_click
+  #   print(event)
+  #   if(is.null(event)){
+  #     event<-data.frame("lng"=-58.50,
+  #                       "lat"=-34.60)
+  #   }
+  #   
+  #   coord_select<-data.frame("lon"=event$lng,
+  #                            "lat"=event$lat)
+  #   
+  #   coordinates(coord_select)<-c("lon","lat")
+  #   proj4string(coord_select) <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
+  #   
+  #   
+  #   selected_adm<-sp::over(coord_select,
+  #                          admin_poly)
+  #   
+  #   selected_adm<-c(as.character(selected_adm$ISO_NODE))
+  #   
+  #   
+  #   print(selected_adm)
+  #   
+  #   #return(selected_adm)
+  # })
 })
