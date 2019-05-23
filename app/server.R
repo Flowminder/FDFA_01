@@ -6,6 +6,38 @@
 # Server #### 
 server <- shinyServer(function(input, output, session) {
   
+  # global_figures ####
+  output$global_figures<-renderUI({
+    global_figures=IM%>%
+      summarise(sum_total=sum(total,na.rm = T),
+                sum_females=sum(females,na.rm = T))%>%
+      collect()%>%
+      mutate(females_perc=sum_females/sum_total)%>%
+      select(sum_total,females_perc)
+    
+    HTML(paste0("<h4>",
+                "<strong>","Number of Migrants: ",
+                "</strong>",
+                formatC(global_figures$sum_total, big.mark = ","),
+                "</h4>",
+                "<h4>",
+                "<strong>","Proportion of migrants in the population: ",
+                "</strong>",
+                paste0(round(collect(world_share_mig)$mig_share*100,1),"%"),
+                "</h4>",
+                "<h4>",
+                "<strong>","Proportion of females among migrants: ",
+                "</strong>",
+                paste0(round(global_figures$females_perc*100,1),"%"),
+                "</h4>",
+                sep = '<br/>'
+    ))
+  })
+  
+  # top_10_total ####
+  
+  # top_10_females ####
+  
   # data_map1 ####
   data_map1=reactive({
     con_selected=switch(input$direction1, 
@@ -48,7 +80,8 @@ server <- shinyServer(function(input, output, session) {
   # Map1: base map ####
   output$map1<-renderLeaflet({
     leaflet() %>%
-      addTiles()
+      addTiles()%>%
+      setView(lng=0,lat=0,zoom = 2)
   })
 
   # Map1 ####
@@ -138,7 +171,8 @@ server <- shinyServer(function(input, output, session) {
   # Map2: base map ####
   output$map2<-renderLeaflet({
     leaflet() %>%
-      addTiles()
+      addTiles()%>%
+      setView(lng=0,lat=0,zoom = 2)
   })
   
   # Map2 ####
