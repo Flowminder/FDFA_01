@@ -191,9 +191,12 @@ Top_perc_mig_ISO=IM%>%
   group_by(ISO)%>%
   summarise(sum_total=sum(total,na.rm = T))%>%
   left_join(nick_mig%>%
-              select(ISOI,POPI)%>%
+              select(ISOI,ISO_NODEI,POPI)%>%
+              group_by(ISO_NODEI)%>%
+              summarise(POP=mean(POPI,na.rm=T),
+                        ISOI=ISOI)%>%
               group_by(ISOI)%>%
-              summarise(POP=sum(POPI,na.rm=T)),
+              summarise(POP=sum(POP,na.rm=T)),
             by=c("ISO"="ISOI"))%>%
   collect()%>%
   mutate(migrant_per_pop=sum_total/POP)%>%
