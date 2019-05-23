@@ -34,8 +34,41 @@ server <- shinyServer(function(input, output, session) {
     ))
   })
   
+  # top_10_data ####
+  top_10_data=reactive({
+    top_mig_count=IM%>%
+      group_by(ISO)%>%
+      summarise(sum_total=sum(total,na.rm = T))%>%
+      arrange(desc(sum_total))%>%
+      collect(n=10)%>%
+      mutate(ISO_f=factor(1:10,
+                          labels=ISO))%>%
+      rename("values"="sum_total")
+    
+    top_mig_share=Top_perc_mig_ISO%>%
+      collect()%>%
+      mutate(ISO_f=factor(1:10, labels = ISO))%>%
+      rename("values"="migrant_per_pop")
+    
+    top_10_data=switch(paste(input$top_10_total_perc),
+                       "FALSE"=top_mig_count,
+                       "TRUE"=top_mig_share)
+
+    return(top_10_data)
+    
+  })
   # top_10_total ####
+  output$top_10_total_bar=renderPlotly({
+    
+    top_10_data_collected=top_10_data()
   
+    p=plot_ly(top_10_data_collected,
+              x=~ISO_f,
+              y=~values,
+              type="bar")
+    
+    p
+  })
   # top_10_females ####
   
   # data_map1 ####
@@ -83,7 +116,7 @@ server <- shinyServer(function(input, output, session) {
       addTiles()%>%
       setView(lng=0,lat=0,zoom = 2)
   })
-
+  
   # Map1 ####
   observe({
     data_to_map_collected=data_map1()
@@ -121,7 +154,7 @@ server <- shinyServer(function(input, output, session) {
     event <- input$map2_shape_click
     
     print(event)
-  
+    
     if(is.null(event)){
       event<-data.frame("id"=55)
     }
