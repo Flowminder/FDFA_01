@@ -11,8 +11,7 @@ all_admin_light=rgdal::readOGR("spatial/All_AdminUnits_final_simplified/all_admi
 
 # Emigration movements per admin unit ####
 EM_data=table_gender_mig%>%
-  mutate(ISO_NODEJ=paste(ISOI,as.integer(NODEJ),sep="_"),
-         ISO_NODEI=paste(ISOI,as.integer(NODEI),sep="_"))%>%
+  mutate(ISO_NODEI=paste(ISOI,as.integer(NODEI),sep="_"))%>% # ISO_NODEI: origin ISO and 
   group_by(ISO_NODEI)%>%
   summarise(total=sum(MIGIJ_F_est+MIGIJ_M_est,na.rm = T),
             females=sum(MIGIJ_F_est,na.rm = T),
@@ -22,12 +21,13 @@ EM_data=table_gender_mig%>%
   mutate(females_perc=ifelse(is.infinite(females_perc),0,females_perc),
          males_perc=ifelse(is.infinite(males_perc),0,males_perc))%>%
   select(ISO_NODEI,total,females,males,females_perc,males_perc)%>%
+  mutate(ISO=substr(ISO_NODEI,1,3))%>%
   rename("ISO_NODE"="ISO_NODEI")
 
 # Immigratoin movements per admin unit ####
 IM_data=table_gender_mig%>%
-  mutate(ISO_NODEJ=paste(ISOI,as.integer(NODEJ),sep="_"),
-         ISO_NODEI=paste(ISOI,as.integer(NODEI),sep="_"))%>%
+  mutate(ISOJ=ISOI)%>% # to be removed once international data are available
+  mutate(ISO_NODEJ=paste(ISOJ,as.integer(NODEJ),sep="_"))%>%
   group_by(ISO_NODEJ)%>%
   summarise(total=sum(MIGIJ_F_est+MIGIJ_M_est,na.rm = T),
             females=sum(MIGIJ_F_est,na.rm = T),
@@ -37,6 +37,7 @@ IM_data=table_gender_mig%>%
   mutate(females_perc=ifelse(is.infinite(females_perc),0,females_perc),
          males_perc=ifelse(is.infinite(males_perc),0,males_perc))%>%
   select(ISO_NODEJ,total,females,males,females_perc,males_perc)%>%
+  mutate(ISO=substr(ISO_NODEJ,1,3))%>%
   rename("ISO_NODE"="ISO_NODEJ")
 
 # Net immigration movements per admin unit ####
@@ -54,7 +55,7 @@ Net_IM=IM_data%>%
          males_perc=net_IM_males/net_IM)%>%
   mutate(females_perc=ifelse(is.infinite(females_perc),0,females_perc),
          males_perc=ifelse(is.infinite(males_perc),0,males_perc))%>%
-  select(ISO_NODE,net_IM,net_IM_females,net_IM_males,females_perc,males_perc)%>%
+  select(ISO_NODE,ISO,net_IM,net_IM_females,net_IM_males,females_perc,males_perc)%>%
   rename("total"="net_IM",
          "females"="net_IM_females",
          "males"="net_IM_males")
@@ -74,7 +75,7 @@ Net_EM=IM_data%>%
          males_perc=net_EM_males/net_EM)%>%
   mutate(females_perc=ifelse(is.infinite(females_perc),0,females_perc),
          males_perc=ifelse(is.infinite(males_perc),0,males_perc))%>%
-  select(ISO_NODE,net_EM,net_EM_females,net_EM_males,females_perc,males_perc)%>%
+  select(ISO_NODE,ISO,net_EM,net_EM_females,net_EM_males,females_perc,males_perc)%>%
   rename("total"="net_EM",
          "females"="net_EM_females",
          "males"="net_EM_males")
@@ -92,7 +93,7 @@ EM_IM=IM_data%>%
          EM_IM_males=males+males_EM,
          females_perc=EM_IM_females/EM_IM,
          males_perc=EM_IM_males/EM_IM)%>%
-  select(ISO_NODE,EM_IM,EM_IM_females,EM_IM_males,females_perc,males_perc)%>%
+  select(ISO_NODE,ISO,EM_IM,EM_IM_females,EM_IM_males,females_perc,males_perc)%>%
   rename("total"="EM_IM",
          "females"="EM_IM_females",
          "males"="EM_IM_males")
@@ -105,42 +106,44 @@ copy_to(mig_db,
         EM_data,
         name="EM",
         temporary = FALSE,
-        indexes = list("ISO_NODE"),
+        indexes = list("ISO_NODE","ISO"),
         overwrite = T)
 
 copy_to(mig_db,
         IM_data,
         name="IM",
         temporary = FALSE,
-        indexes = list("ISO_NODE"),
+        indexes = list("ISO_NODE","ISO"),
         overwrite = T)
 
 copy_to(mig_db,
         Net_IM,
         name = "Net_IM",
         temporary = FALSE,
-        indexes = list("ISO_NODE"),
+        indexes = list("ISO_NODE","ISO"),
         overwrite = T)
 
 copy_to(mig_db,
         Net_EM,
         name = "Net_EM",
         temporary = FALSE,
-        indexes = list("ISO_NODE"),
+        indexes = list("ISO_NODE","ISO"),
         overwrite = T)
 
 copy_to(mig_db,
         EM_IM,
         name = "EM_IM",
         temporary = FALSE,
-        indexes = list("ISO_NODE"),
+        indexes = list("ISO_NODE","ISO"),
         overwrite = T)
 
 # store table_gender_mig in the database ####
 table_gender_mig_s=table_gender_mig%>%
-  mutate(ISO_NODEJ=paste(ISOI,as.integer(NODEJ),sep="_"),
+  mutate(ISOJ=ISOI,
+         CONTJ=CONTI)%>% # to be removed once international data are available
+  mutate(ISO_NODEJ=paste(ISOJ,as.integer(NODEJ),sep="_"),
          ISO_NODEI=paste(ISOI,as.integer(NODEI),sep="_"))%>%
-  select(MIGIJ_F_est,MIGIJ_M_est,ISO_NODEI,ISO_NODEJ,CONTI,ISOI)%>%
+  select(MIGIJ_F_est,MIGIJ_M_est,ISO_NODEI,ISO_NODEJ,CONTI,ISOI,CONTJ,ISOJ)%>%
   rename("females"="MIGIJ_F_est",
          "males"="MIGIJ_M_est")%>%
   mutate(total=females+males,
@@ -152,7 +155,7 @@ copy_to(mig_db,
         table_gender_mig_s,
         name = "gender_mig",
         temporary = FALSE,
-        indexes = list("ISO_NODEI","ISO_NODEJ","CONTI","ISOI"),
+        indexes = list("ISO_NODEI","ISO_NODEJ","CONTI","ISOI","CONTJ","ISOJ"),
         overwrite = T)
 
 # store table_nick_mig in the database ####
