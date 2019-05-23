@@ -184,3 +184,26 @@ copy_to(mig_db,
         temporary = FALSE,
         indexes = list("CONT","ISO","ISO_NODE"),
         overwrite = T)
+
+
+# internal migrant number and pop per country ####
+Top_perc_mig_ISO=IM%>%
+  group_by(ISO)%>%
+  summarise(sum_total=sum(total,na.rm = T))%>%
+  left_join(nick_mig%>%
+              select(ISOI,POPI)%>%
+              group_by(ISOI)%>%
+              summarise(POP=sum(POPI,na.rm=T)),
+            by=c("ISO"="ISOI"))%>%
+  collect()%>%
+  mutate(migrant_per_pop=sum_total/POP)%>%
+  arrange(desc(migrant_per_pop))%>%
+  top_n(10,migrant_per_pop)
+
+
+copy_to(mig_db,
+        Top_perc_mig_ISO,
+        name="Top_perc_mig_ISO",
+        temporary = FALSE,
+        indexes = list("ISO"),
+        overwrite = T)
