@@ -6,15 +6,9 @@
 # Server #### 
 server <- shinyServer(function(input, output, session) {
   
-  # Base map ####
-  output$map<-renderLeaflet({
-    leaflet() %>%
-      addTiles()
-  })
-  
-  # data_to_map_tm ####
-  data_to_map_tm=reactive({
-    con_selected=switch(input$direction, 
+  # data_map1 ####
+  data_map1=reactive({
+    con_selected=switch(input$direction1, 
                         "emigration" = EM,
                         "immigration" = IM,
                         "net_immigration" = Net_IM,
@@ -29,25 +23,80 @@ server <- shinyServer(function(input, output, session) {
     return(data_to_map_tm)
   })
   
-  # data_to_map_origin_dest ####
-  data_to_map_od=reactive({
-    ISO_NODE=switch(input$direction,  
+  # labels_map1 ####
+  labels_map1=reactive({
+    
+    data_to_map_collected=data_map1()
+    
+    field_to_map=input$gender1
+    
+    labels=sprintf( 
+      paste("<strong>%s</strong><br/>%s", field_to_map),
+      
+      unlist(data_to_map_collected@data[,"CONT"]),
+      
+      formatC(unlist(data_to_map_collected@data[,field_to_map]),
+              format="f",
+              digits=0,
+              big.mark="'")
+    ) %>% lapply(htmltools::HTML)
+    
+    return(labels)
+    
+  })
+  
+  # Map1: base map ####
+  output$map1<-renderLeaflet({
+    leaflet() %>%
+      addTiles()
+  })
+
+  # Map1 ####
+  observe({
+    data_to_map_collected=data_map1()
+    
+    field_to_map=input$gender1
+    
+    labels=labels_map1()
+    
+    p<-leafletProxy("map1")%>%
+      addPolygons(data=data_to_map_collected,
+                  weight=1,
+                  color = "#444444",
+                  fillOpacity = 1,
+                  fillColor = ~colorQuantile("Greens", get(field_to_map))(get(field_to_map)),
+                  layerId = 1:dim(data_to_map_collected)[1],
+                  label = labels,
+                  labelOptions = labelOptions(
+                    style = list("font-weight" = "normal", padding = "3px 8px"),
+                    textsize = "15px",
+                    direction = "auto"))
+    
+    return(p)
+  })
+  
+  
+  # data_map2 ####
+  data_map2=reactive({
+    ISO_NODE=switch(input$direction2,  
                     "emigration" = "ISO_NODEI",
                     "immigration" = "ISO_NODEJ",
                     "net_immigration" = c("ISO_NODEI","ISO_NODEJ"),
                     "net_emigration" = c("ISO_NODEJ","ISO_NODEI"),
                     "total_migration"=c("ISO_NODEI","ISO_NODEJ"))
     
-    event <- input$map_shape_click
-      if(is.null(event)){
-        event<-data.frame("id"=55)
-      }
+    event <- input$map2_shape_click
+    
+    print(event)
+  
+    if(is.null(event)){
+      event<-data.frame("id"=55)
+    }
     
     layerID_selected=event$id
     
     ISO_NODE_clicked=admin_poly$ISO_NODE[layerID_selected]
     
-  
     
     admin_data=gender_mig%>%
       filter((!!sym(ISO_NODE))==ISO_NODE_clicked)%>%
@@ -64,16 +113,14 @@ server <- shinyServer(function(input, output, session) {
     return(data_to_map_od)
   })
   
-  # labels ####
-  labels=reactive({
+  # labels_map2 ####
+  labels_map2=reactive({
     
-    data_to_map_collected=switch(input$movement,
-                                 "movements"=data_to_map_tm(),
-                                 "origin_destination"=data_to_map_od())
+    data_to_map_collected=data_map2()
     
-    field_to_map=input$gender
+    field_to_map=input$gender2
     
-    labels=sprintf( # label
+    labels=sprintf( 
       paste("<strong>%s</strong><br/>%s", field_to_map),
       
       unlist(data_to_map_collected@data[,"CONT"]),
@@ -88,18 +135,21 @@ server <- shinyServer(function(input, output, session) {
     
   })
   
+  # Map2: base map ####
+  output$map2<-renderLeaflet({
+    leaflet() %>%
+      addTiles()
+  })
   
-  # Map ####
+  # Map2 ####
   observe({
-    data_to_map_collected=switch(input$movement,
-           "movements"=data_to_map_tm(),
-           "origin_destination"=data_to_map_od())
+    data_to_map_collected=data_map2()
     
-    field_to_map=input$gender
+    field_to_map=input$gender2
     
-    labels=labels()
+    labels=labels_map2()
     
-    p<-leafletProxy("map")%>%
+    p<-leafletProxy("map2")%>%
       addPolygons(data=data_to_map_collected,
                   weight=1,
                   color = "#444444",
@@ -114,5 +164,16 @@ server <- shinyServer(function(input, output, session) {
     
     return(p)
   })
+  
+  # movement_type ####
+  
+  # gender_pie ####
+  
+  # circle_od ####
+  
+  # od_bar ####
+  
+  # od_bar_title ####
+  
   
 })

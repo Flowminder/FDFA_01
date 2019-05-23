@@ -3,15 +3,13 @@
 ###################
 
 # UI components ####
-leaflet_map=leafletOutput("map",width="100%",height="1200px")
 
-dropdown_movement=selectInput("movement",
-                              label = "Movements",
-                              c("Total movements at admin unit"="movements",
-                                "Origin-Destination from and to admin unit"="origin_destination"),
-                              selected = "movements")
+panel_style=tags$head(tags$style(HTML('#PANEL {background-color: rgba(190,190,190,0.5);}')))
 
-dropdown_direction=selectInput("direction", 
+# Tab 1
+leaflet_map1=leafletOutput("map1",width="100%",height="1200px")
+
+dropdown_direction1=selectInput("direction1", 
                                label = "Direction",
                                choices = c("Emigration"="emigration",
                                            "Immigration"="immigration",
@@ -20,7 +18,7 @@ dropdown_direction=selectInput("direction",
                                            "Total migration (in and out)"="total_migration"),
                                selected = "emigration")
 
-dropdown_gender=selectInput("gender", 
+dropdown_gender1=selectInput("gender1", 
                             label = "Gender",
                             choices = c("Total (females and males)"="total",
                                         "Females"="females",
@@ -29,34 +27,77 @@ dropdown_gender=selectInput("gender",
                                         "Males as percent of total"="males_perc"),
                             selected = "total")
 
-dropdown_basemap=selectInput("base_map", 
+dropdown_basemap1=selectInput("base_map1", 
                              label = "Base map",
                              choices = c("Open street map"="OSM",
                                          "Population density"="pop_dens"),
                              selected = "OSM")
 
 
-widget_panel=absolutePanel(top = 50, left = 15,
+widget_panel1=absolutePanel(top = 50, left = 15,
                            draggable = TRUE,
                            class = "panel panel-default",
                            id="PANEL",
-                           dropdown_movement,
-                           dropdown_direction,
-                           dropdown_gender,
-                           dropdown_basemap)
+                           dropdown_direction1,
+                           dropdown_gender1,
+                           dropdown_basemap1)
 
-panel_style=tags$head(tags$style(HTML('#PANEL {background-color: rgba(190,190,190,0.5);}')))
+# Tab 2
+leaflet_map2=leafletOutput("map2",width="100%",height="1200px")
+
+dropdown_direction2=selectInput("direction2", 
+                                label = "Direction",
+                                choices = c("Emigration"="emigration",
+                                            "Immigration"="immigration",
+                                            "Net immigration"="net_immigration",
+                                            "Net Emigration"="net_emigration",
+                                            "Total migration (in and out)"="total_migration"),
+                                selected = "emigration")
+
+dropdown_gender2=selectInput("gender2", 
+                             label = "Gender",
+                             choices = c("Total (females and males)"="total",
+                                         "Females"="females",
+                                         "Males"="males",
+                                         "Females as percent of total"="females_perc",
+                                         "Males as percent of total"="males_perc"),
+                             selected = "total")
+
+dropdown_basemap2=selectInput("base_map2", 
+                              label = "Base map",
+                              choices = c("Open street map"="OSM",
+                                          "Population density"="pop_dens"),
+                              selected = "OSM")
+
+
+widget_panel2=absolutePanel(top = 50, left = 15,
+                             draggable = TRUE,
+                             class = "panel panel-default",
+                             id="PANEL",
+                             dropdown_direction2,
+                             dropdown_gender2,
+                             dropdown_basemap2)
 
 # UI structure ####
 ui <- shinyUI(navbarPage("Gender-disaggregated Migration Movements",
                          
-                         tabPanel("Map",
+                         tabPanel("Map global",
                                   fluidPage(
                                     panel_style,
                                     column(12,
-                                           leaflet_map,
-                                           widget_panel
+                                           leaflet_map1,
+                                           widget_panel1
                                            
+                                    )
+                                  )
+                         ),
+                         tabPanel("Origin destination",
+                                  fluidPage(
+                                    panel_style,
+                                    column(12,
+                                           leaflet_map2,
+                                           widget_panel2
+
                                     )
                                   )
                          )
