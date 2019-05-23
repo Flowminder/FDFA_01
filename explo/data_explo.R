@@ -6,6 +6,8 @@ rm(list=ls())
 library(dplyr)
 library(RPostgreSQL)
 library(leaflet)
+library(plotly)
+library(tidyr)
 # set the directory ####
 setwd("C:/Users/Xavier Vollenweider/Dropbox/FDFA_01/data/")
 
@@ -101,3 +103,78 @@ leaflet(data_to_plot)%>%
               fillOpacity = 1,
               fillColor = ~colorQuantile("Greens", total)(total),
               popup = ~total)
+
+
+# get total number of migrants per gender ####
+IM =tbl(mig_db, "IM")
+nick_mig =tbl(mig_db, "nick_mig")
+
+# global
+IM%>%
+  summarise(sum_total=sum(total,na.rm = T),
+            sum_females=sum(females,na.rm = T))%>%
+  collect()%>%
+  mutate(females_perc=sum_females/sum_total)%>%
+  select(sum_total,females_perc)
+  
+IM%>%
+  group_by(ISO)%>%
+  summarise(sum_total=sum(total,na.rm = T))%>%
+  arrange(desc(sum_total))%>%
+  collect(n=10)%>%
+  mutate(ISO_f=factor(1:10,
+                      labels=ISO))%>%
+  plot_ly(x=~ISO_f,
+          y=~sum_total,
+          type="bar")
+
+Top_perc_mig_ISO=tbl(mig_db, "Top_perc_mig_ISO")
+
+Top_perc_mig_ISO%>%
+  collect()%>%
+  mutate(ISO_f=factor(1:10, labels = ISO))%>%
+  plot_ly(x=~ISO_f,
+          y=~migrant_per_pop,
+          type="bar")
+
+# national
+IM%>%
+  filter(ISO=="ARG")%>%
+  summarise(sum_females=sum(females,na.rm = T),
+            sum_total=sum(total,na.rm = T))%>%
+  collect()%>%
+  mutate(females_perc=sum_females/sum_total)%>%
+  select(sum_total,females_perc)%>%
+  gather(key=key)
+  
+IM%>%
+  filter(ISO=="ARG")%>%
+  arrange(desc(total))%>%
+  collect(n=10)%>%
+  mutate(ISO_NODE_f=factor(1:10,
+                      labels=ISO_NODE))%>%
+  plot_ly(x=~ISO_NODE_f,
+          y=~total,
+          type="bar")
+
+IM%>%
+  filter(ISO=="ARG")%>%
+  left_join(nick_mig%>%
+              filter(ISOI=="ARG")%>%
+              select(ISO_NODEI, POPI)%>%
+              group_by(ISO_NODEI)%>%
+              summarise(POP=mean(POPI,na.rm=T))%>%
+              rename("ISO_NODE"="ISO_NODEI"),
+            by="ISO_NODE")%>%
+  collect()%>%
+  mutate(prop_mig=total/POP)%>%
+  arrange(desc(prop_mig))%>%
+  top_n(10,prop_mig)%>%
+  mutate(ISO_NODE_f=factor(1:10,
+                           labels=ISO_NODE))%>%
+  plot_ly(x=~ISO_NODE_f,
+          y=~prop_mig,
+          type="bar")
+
+
+
