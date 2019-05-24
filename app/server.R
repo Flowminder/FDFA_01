@@ -15,6 +15,8 @@ server <- shinyServer(function(input, output, session) {
       mutate(females_perc=sum_females/sum_total)%>%
       select(sum_total,females_perc)
     
+    world_share_mig_collected=collect(world_share_mig)
+    
     HTML(paste0("<h4>",
                 "<strong>","Number of Migrants: ",
                 "</strong>",
@@ -23,7 +25,7 @@ server <- shinyServer(function(input, output, session) {
                 "<h4>",
                 "<strong>","Proportion of migrants in the population: ",
                 "</strong>",
-                paste0(round(collect(world_share_mig)$mig_share*100,1),"%"),
+                paste0(round(world_share_mig_collected$mig_perc*100,1),"%"),
                 "</h4>",
                 "<h4>",
                 "<strong>","Proportion of females among migrants: ",
@@ -45,19 +47,19 @@ server <- shinyServer(function(input, output, session) {
                           labels=ISO))%>%
       rename("values"="sum_total")
     
-    top_mig_share=Top_perc_mig_ISO%>%
+    top_mig_perc=Top_perc_mig_ISO%>%
       collect()%>%
       mutate(ISO_f=factor(1:10, labels = ISO))%>%
       rename("values"="migrant_per_pop")
     
     top_10_data=switch(paste(input$top_10_total_perc),
                        "FALSE"=top_mig_count,
-                       "TRUE"=top_mig_share)
+                       "TRUE"=top_mig_perc)
 
     return(top_10_data)
     
   })
-  # top_10_total ####
+  # top_10_total_bar ####
   output$top_10_total_bar=renderPlotly({
     
     top_10_data_collected=top_10_data()
@@ -70,6 +72,114 @@ server <- shinyServer(function(input, output, session) {
     p
   })
   # top_10_females ####
+  top_10_females_data=reactive({
+    top_females_count=IM%>%
+      group_by(ISO)%>%
+      summarise(sum_females=sum(females,na.rm = T))%>%
+      arrange(desc(sum_females))%>%
+      collect(n=10)%>%
+      mutate(ISO_f=factor(1:10,
+                          labels=ISO))%>%
+      rename("values"="sum_females")
+    
+    top_females_perc=IM%>%
+      group_by(ISO)%>%
+      summarise(sum_females=sum(females,na.rm = T),
+                sum_total=sum(total,na.rm = T))%>%
+      collect()%>%
+      mutate(females_perc=sum_females/sum_total)%>%
+      arrange(desc(females_perc))%>%
+      top_n(10,females_perc)%>%
+      mutate(ISO_f=factor(1:10,
+                          labels=ISO))%>%
+      rename("values"="females_perc")
+    
+    top_10_females_data=switch(paste(input$top_10_females_perc),
+                       "FALSE"=top_females_count,
+                       "TRUE"=top_females_perc)
+    
+    return(top_10_females_data)
+    
+  })
+  # top_10_females_bar ####
+  output$top_10_females_bar=renderPlotly({
+    
+    top_10_females_data_collected=top_10_females_data()
+    
+    p=plot_ly(top_10_females_data_collected,
+              x=~ISO_f,
+              y=~values,
+              type="bar")
+    
+    p
+  })
+  
+  # country_summary_data ####
+  country_summary_data=reactive({
+    country_summary_data=IM%>%
+      filter(ISO=="ARG")%>%
+      group_by(ISO)%>%
+      summarise(sum_females=sum(females,na.rm = T),
+                sum_total=sum(total,na.rm = T))%>%
+      left_join(POP_ISO_NODE%>%
+                  select(ISO,POP)%>%
+                  filter(ISO=="ARG")%>%
+                  group_by(ISO)%>%
+                  summarise(POP=sum(POP,na.rm=T)),
+                by="ISO")%>%
+      collect()%>%
+      mutate(females_perc=sum_females/sum_total,
+             mig_perc=sum_total/POP)%>%
+      select(sum_total,females_perc,mig_perc)
+    
+    return(country_summary_data)
+  })
+  
+  # country_summary_UI ####
+  output$country_summary=renderUI({
+
+    country_summary_data_collected=country_summary_data()
+
+    HTML(paste0("<h4>",
+                "<strong>","Number of Migrants: ",
+                "</strong>",
+                formatC(country_summary_data_collected$sum_total, big.mark = ","),
+                "</h4>",
+                "<h4>",
+                "<strong>","Proportion of migrants in the population: ",
+                "</strong>",
+                paste0(round(country_summary_data_collected$mig_perc*100,1),"%"),
+                "</h4>",
+                "<h4>",
+                sep = '<br/>'
+    ))
+
+  })
+  # country_female_pie ####
+  output$country_female_pie=renderPlotly({
+
+    country_summary_data_collected=country_summary_data()
+
+    data_pie=country_summary_data_collected%>%
+      mutate(males_perc=1-females_perc)%>%
+      select(females_perc,males_perc)%>%
+      gather(key=key)%>%
+      mutate(labels=factor(2:1,
+                           labels = c("Females","Males")))%>%
+      rename("values"="value")%>%
+      group_by(labels)
+
+    plot_ly(data_pie,
+            labels=~labels,
+            values=~values,
+            hoverinfo = "text",
+            marker = list(colors = c(RColorBrewer::brewer.pal(9,"Greens")[7],
+                                     RColorBrewer::brewer.pal(9,"Greens")[2]),
+                          line = list(color = '#FFFFFF', width = 1)))%>%
+      add_pie(hole = 0.6)%>%
+      layout(title=paste0("Proportion Females among Migrants"))
+
+  })
   
   # data_map1 ####
   data_map1=reactive({
