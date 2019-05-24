@@ -79,6 +79,7 @@ widget_panel2=absolutePanel(top = 50, left = 15,
                             dropdown_basemap2)
 
 global_figures=htmlOutput("global_figures", align="left")
+global_female_pie=plotlyOutput("global_female_pie")
 
 top_10_total_bar=plotlyOutput("top_10_total_bar")
 top_10_total_perc=checkboxInput("top_10_total_perc",
@@ -105,7 +106,8 @@ ui <- shinyUI(navbarPage("Gender-disaggregated Migration Movements",
                                     
                                     fluidRow(
                                       column(4,
-                                             global_figures),
+                                             global_figures,
+                                             global_female_pie),
                                       column(4,
                                              top_10_total_bar,
                                              top_10_total_perc),

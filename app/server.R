@@ -6,35 +6,70 @@
 # Server #### 
 server <- shinyServer(function(input, output, session) {
   
+  # global_figures_data ####
+  global_figures_data=reactive({
+    
+    global_figures_data=IM%>%
+    summarise(sum_total=sum(total,na.rm = T),
+              sum_females=sum(females,na.rm = T),
+              sum_males=sum(males,na.rm = T))%>%
+    collect()%>%
+    mutate(females_perc=sum_females/sum_total,
+           males_perc=sum_males/sum_total)%>%
+    select(sum_total,females_perc,males_perc)
+  
+  return(global_figures_data)
+  })
   # global_figures ####
   output$global_figures<-renderUI({
-    global_figures=IM%>%
-      summarise(sum_total=sum(total,na.rm = T),
-                sum_females=sum(females,na.rm = T))%>%
-      collect()%>%
-      mutate(females_perc=sum_females/sum_total)%>%
-      select(sum_total,females_perc)
     
+    global_figures_collected=global_figures_data()
     world_share_mig_collected=collect(world_share_mig)
     
     HTML(paste0("<h4>",
                 "<strong>","Number of Migrants: ",
                 "</strong>",
-                formatC(global_figures$sum_total, big.mark = ","),
+                formatC(global_figures_collected$sum_total, big.mark = ","),
                 "</h4>",
                 "<h4>",
                 "<strong>","Proportion of migrants in the population: ",
                 "</strong>",
-                paste0(round(world_share_mig_collected$mig_perc*100,1),"%"),
+                paste0(round(world_share_mig_collected$mig_share*100,1),"%"),
                 "</h4>",
                 "<h4>",
                 "<strong>","Proportion of females among migrants: ",
                 "</strong>",
-                paste0(round(global_figures$females_perc*100,1),"%"),
+                paste0(round(global_figures_collected$females_perc*100,1),"%"),
                 "</h4>",
                 sep = '<br/>'
     ))
   })
+  
+  # global_female_pie ####
+  output$global_female_pie=renderPlotly({
+    
+    global_figures_data_collected=global_figures_data()
+    
+    data_pie=global_figures_data_collected%>%
+      select(females_perc,males_perc)%>%
+      gather(key=key)%>%
+      mutate(labels=factor(2:1,
+                           labels = c("Males","Females")))%>%
+      rename("values"="value")%>%
+      group_by(labels)
+    
+    plot_ly(data_pie,
+            labels=~labels,
+            values=~values,
+            hoverinfo = "text",
+            marker = list(colors = c(RColorBrewer::brewer.pal(9,"Greens")[7],
+                                     RColorBrewer::brewer.pal(9,"Greens")[2]),
+                          line = list(color = '#FFFFFF', width = 1)))%>%
+      add_pie(hole = 0.6)%>%
+      layout(title=paste0("Proportion Females among Migrants"))
+    
+  })
+  
   
   # top_10_data ####
   top_10_data=reactive({
@@ -114,24 +149,44 @@ server <- shinyServer(function(input, output, session) {
     p
   })
   
+  # ISO_NODE_clicked1 ####
+  layerID_clicked1=reactive({
+    event <- input$map1_shape_click
+    
+    print(event)
+    
+    if(is.null(event)){
+      event<-data.frame("id"=55)
+    }
+    
+    layerID_clicked1=event$id
+    return(layerID_clicked1)
+  })
+  
   # country_summary_data ####
   country_summary_data=reactive({
     
+    layerID_clicked1_collected=layerID_clicked1()
+    
+    
+    ISO_clicked1=admin_poly$ISO[layerID_clicked1_collected]
+    
+    
     country_summary_data=IM%>%
-      filter(ISO=="ARG")%>%
+      filter(ISO==ISO_clicked1)%>%
       group_by(ISO)%>%
       summarise(sum_females=sum(females,na.rm = T),
                 sum_total=sum(total,na.rm = T))%>%
       left_join(POP_ISO_NODE%>%
                   select(ISO,POP)%>%
-                  filter(ISO=="ARG")%>%
+                  filter(ISO==ISO_clicked1)%>%
                   group_by(ISO)%>%
                   summarise(POP=sum(POP,na.rm=T)),
                 by="ISO")%>%
       collect()%>%
       mutate(females_perc=sum_females/sum_total,
              mig_perc=sum_total/POP)%>%
-      select(sum_total,females_perc,mig_perc)
+      select(sum_total,females_perc,mig_perc,ISO)
     
     return(country_summary_data)
   })
@@ -141,7 +196,12 @@ server <- shinyServer(function(input, output, session) {
     
     country_summary_data_collected=country_summary_data()
     
-    HTML(paste0("<h4>",
+    HTML(paste0("<h2>",
+                "<strong>","Country Selected: ",
+                "</strong>",
+                country_summary_data_collected$ISO,
+                "</h2>",
+                "<h4>",
                 "<strong>","Number of Migrants: ",
                 "</strong>",
                 formatC(country_summary_data_collected$sum_total, big.mark = ","),
@@ -166,7 +226,7 @@ server <- shinyServer(function(input, output, session) {
       select(females_perc,males_perc)%>%
       gather(key=key)%>%
       mutate(labels=factor(2:1,
-                           labels = c("Females","Males")))%>%
+                           labels = c("Males","Females")))%>%
       rename("values"="value")%>%
       group_by(labels)
     
