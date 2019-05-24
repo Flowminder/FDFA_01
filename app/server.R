@@ -55,7 +55,7 @@ server <- shinyServer(function(input, output, session) {
     top_10_data=switch(paste(input$top_10_total_perc),
                        "FALSE"=top_mig_count,
                        "TRUE"=top_mig_perc)
-
+    
     return(top_10_data)
     
   })
@@ -63,7 +63,7 @@ server <- shinyServer(function(input, output, session) {
   output$top_10_total_bar=renderPlotly({
     
     top_10_data_collected=top_10_data()
-  
+    
     p=plot_ly(top_10_data_collected,
               x=~ISO_f,
               y=~values,
@@ -95,8 +95,8 @@ server <- shinyServer(function(input, output, session) {
       rename("values"="females_perc")
     
     top_10_females_data=switch(paste(input$top_10_females_perc),
-                       "FALSE"=top_females_count,
-                       "TRUE"=top_females_perc)
+                               "FALSE"=top_females_count,
+                               "TRUE"=top_females_perc)
     
     return(top_10_females_data)
     
@@ -116,6 +116,7 @@ server <- shinyServer(function(input, output, session) {
   
   # country_summary_data ####
   country_summary_data=reactive({
+    
     country_summary_data=IM%>%
       filter(ISO=="ARG")%>%
       group_by(ISO)%>%
@@ -137,9 +138,9 @@ server <- shinyServer(function(input, output, session) {
   
   # country_summary_UI ####
   output$country_summary=renderUI({
-
+    
     country_summary_data_collected=country_summary_data()
-
+    
     HTML(paste0("<h4>",
                 "<strong>","Number of Migrants: ",
                 "</strong>",
@@ -153,13 +154,13 @@ server <- shinyServer(function(input, output, session) {
                 "<h4>",
                 sep = '<br/>'
     ))
-
+    
   })
   # country_female_pie ####
   output$country_female_pie=renderPlotly({
-
+    
     country_summary_data_collected=country_summary_data()
-
+    
     data_pie=country_summary_data_collected%>%
       mutate(males_perc=1-females_perc)%>%
       select(females_perc,males_perc)%>%
@@ -168,7 +169,7 @@ server <- shinyServer(function(input, output, session) {
                            labels = c("Females","Males")))%>%
       rename("values"="value")%>%
       group_by(labels)
-
+    
     plot_ly(data_pie,
             labels=~labels,
             values=~values,
@@ -178,7 +179,7 @@ server <- shinyServer(function(input, output, session) {
                           line = list(color = '#FFFFFF', width = 1)))%>%
       add_pie(hole = 0.6)%>%
       layout(title=paste0("Proportion Females among Migrants"))
-
+    
   })
   
   # data_map1 ####
@@ -251,16 +252,8 @@ server <- shinyServer(function(input, output, session) {
     return(p)
   })
   
-  
-  # data_map2 ####
-  data_map2=reactive({
-    ISO_NODE=switch(input$direction2,  
-                    "emigration" = "ISO_NODEI",
-                    "immigration" = "ISO_NODEJ",
-                    "net_immigration" = c("ISO_NODEI","ISO_NODEJ"),
-                    "net_emigration" = c("ISO_NODEJ","ISO_NODEI"),
-                    "total_migration"=c("ISO_NODEI","ISO_NODEJ"))
-    
+  # ISO_NODE_clicked2 ####
+  ISO_NODE_clicked2=reactive({
     event <- input$map2_shape_click
     
     print(event)
@@ -271,8 +264,20 @@ server <- shinyServer(function(input, output, session) {
     
     layerID_selected=event$id
     
-    ISO_NODE_clicked=admin_poly$ISO_NODE[layerID_selected]
+    ISO_NODE_clicked2=admin_poly$ISO_NODE[layerID_selected]
+    return(ISO_NODE_clicked2)
+  })
+  
+  # data_map2 ####
+  data_map2=reactive({
+    ISO_NODE=switch(input$direction2,  
+                    "emigration" = "ISO_NODEI",
+                    "immigration" = "ISO_NODEJ",
+                    "net_immigration" = c("ISO_NODEI","ISO_NODEJ"),
+                    "net_emigration" = c("ISO_NODEJ","ISO_NODEI"),
+                    "total_migration"=c("ISO_NODEI","ISO_NODEJ"))
     
+    ISO_NODE_clicked=ISO_NODE_clicked2()
     
     admin_data=gender_mig%>%
       filter((!!sym(ISO_NODE))==ISO_NODE_clicked)%>%
