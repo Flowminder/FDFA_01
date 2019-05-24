@@ -34,6 +34,16 @@ Top_perc_mig_ISO=tbl(mig_db, "Top_perc_mig_ISO")
 world_share_mig=tbl(mig_db, "world_share_mig")
 POP_ISO_NODE=tbl(mig_db, "POP_ISO_NODE")
 
+ISO=tbl(mig_db, "ISO")
+
+m <- list( # plot margins
+  l = 50,
+  r = 50,
+  b = 50,
+  t = 100,
+  pad = 4
+)
+
 # lauch the app ####
 source(paste0(code_dir,
               "ui.R"))

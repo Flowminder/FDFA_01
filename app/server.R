@@ -10,15 +10,15 @@ server <- shinyServer(function(input, output, session) {
   global_figures_data=reactive({
     
     global_figures_data=IM%>%
-    summarise(sum_total=sum(total,na.rm = T),
-              sum_females=sum(females,na.rm = T),
-              sum_males=sum(males,na.rm = T))%>%
-    collect()%>%
-    mutate(females_perc=sum_females/sum_total,
-           males_perc=sum_males/sum_total)%>%
-    select(sum_total,females_perc,males_perc)
-  
-  return(global_figures_data)
+      summarise(sum_total=sum(total,na.rm = T),
+                sum_females=sum(females,na.rm = T),
+                sum_males=sum(males,na.rm = T))%>%
+      collect()%>%
+      mutate(females_perc=sum_females/sum_total,
+             males_perc=sum_males/sum_total)%>%
+      select(sum_total,females_perc,males_perc)
+    
+    return(global_figures_data)
   })
   # global_figures ####
   output$global_figures<-renderUI({
@@ -76,15 +76,20 @@ server <- shinyServer(function(input, output, session) {
     top_mig_count=IM%>%
       group_by(ISO)%>%
       summarise(sum_total=sum(total,na.rm = T))%>%
+      left_join(ISO,
+                by="ISO")%>%
       arrange(desc(sum_total))%>%
       collect(n=10)%>%
-      mutate(ISO_f=factor(1:10,
-                          labels=ISO))%>%
+      mutate(country_name_f=factor(1:10,
+                                   labels=country_name))%>%
       rename("values"="sum_total")
     
     top_mig_perc=Top_perc_mig_ISO%>%
+      left_join(ISO,
+                by="ISO")%>%
       collect()%>%
-      mutate(ISO_f=factor(1:10, labels = ISO))%>%
+      mutate(country_name_f=factor(1:10, labels = country_name),
+             migrant_per_pop=migrant_per_pop*100)%>%
       rename("values"="migrant_per_pop")
     
     top_10_data=switch(paste(input$top_10_total_perc),
@@ -99,10 +104,21 @@ server <- shinyServer(function(input, output, session) {
     
     top_10_data_collected=top_10_data()
     
+    title_s=switch(paste0(input$top_10_total_perc),
+                   "FALSE"="number of migrants",
+                   "TRUE"="proportion of migrants in the population")
+    yaxis_title_s=switch(paste0(input$top_10_total_perc),
+                         "FALSE"="count",
+                         "TRUE"="%")
+    
     p=plot_ly(top_10_data_collected,
-              x=~ISO_f,
+              x=~country_name_f,
               y=~values,
-              type="bar")
+              type="bar")%>%
+      layout(title=paste0("Top 10 countries by\n",title_s),
+             yaxis=list(title=yaxis_title_s),
+             xaxis=list(title=""),
+             margin=m)
     
     p
   })
@@ -111,22 +127,26 @@ server <- shinyServer(function(input, output, session) {
     top_females_count=IM%>%
       group_by(ISO)%>%
       summarise(sum_females=sum(females,na.rm = T))%>%
+      left_join(ISO,
+                by="ISO")%>%
       arrange(desc(sum_females))%>%
       collect(n=10)%>%
-      mutate(ISO_f=factor(1:10,
-                          labels=ISO))%>%
+      mutate(country_name_f=factor(1:10,
+                                   labels=country_name))%>%
       rename("values"="sum_females")
     
     top_females_perc=IM%>%
       group_by(ISO)%>%
       summarise(sum_females=sum(females,na.rm = T),
                 sum_total=sum(total,na.rm = T))%>%
+      left_join(ISO,
+                by="ISO")%>%
       collect()%>%
-      mutate(females_perc=sum_females/sum_total)%>%
+      mutate(females_perc=100*sum_females/sum_total)%>%
       arrange(desc(females_perc))%>%
       top_n(10,females_perc)%>%
-      mutate(ISO_f=factor(1:10,
-                          labels=ISO))%>%
+      mutate(country_name_f=factor(1:10,
+                                   labels=country_name))%>%
       rename("values"="females_perc")
     
     top_10_females_data=switch(paste(input$top_10_females_perc),
@@ -141,10 +161,21 @@ server <- shinyServer(function(input, output, session) {
     
     top_10_females_data_collected=top_10_females_data()
     
+    title_s=switch(paste0(input$top_10_females_perc),
+                   "FALSE"="number of female migrants",
+                   "TRUE"="proportion of female among migrants")
+    yaxis_title_s=switch(paste0(input$top_10_total_perc),
+                         "FALSE"="count",
+                         "TRUE"="%")
+    
     p=plot_ly(top_10_females_data_collected,
-              x=~ISO_f,
+              x=~country_name_f,
               y=~values,
-              type="bar")
+              type="bar")%>%
+      layout(title=paste0("Top 10 countries by\n",title_s),
+             yaxis=list(title=yaxis_title_s),
+             xaxis=list(title=""),
+             margin=m)
     
     p
   })
@@ -152,11 +183,10 @@ server <- shinyServer(function(input, output, session) {
   # layerID_clicked ####
   layerID_clicked=reactive({
     
-    print(input$tabs)
     event=switch(input$tabs,
-           "global"=input$map1_shape_click,
-           "od"=input$map2_shape_click)
-
+                 "global"=input$map1_shape_click,
+                 "od"=input$map2_shape_click)
+    
     if(is.null(event)){
       event<-data.frame("id"=55)
     }
@@ -185,10 +215,12 @@ server <- shinyServer(function(input, output, session) {
                   group_by(ISO)%>%
                   summarise(POP=sum(POP,na.rm=T)),
                 by="ISO")%>%
+      left_join(ISO,
+                by="ISO")%>%
       collect()%>%
       mutate(females_perc=sum_females/sum_total,
              mig_perc=sum_total/POP)%>%
-      select(sum_total,females_perc,mig_perc,ISO)
+      select(sum_total,females_perc,mig_perc,ISO,country_name)
     
     return(country_summary_data)
   })
@@ -201,7 +233,7 @@ server <- shinyServer(function(input, output, session) {
     HTML(paste0("<h2>",
                 "<strong>","Country Selected: ",
                 "</strong>",
-                country_summary_data_collected$ISO,
+                country_summary_data_collected$country_name,
                 "</h2>",
                 "<h4>",
                 "<strong>","Number of Migrants: ",
@@ -297,13 +329,15 @@ server <- shinyServer(function(input, output, session) {
     top_10_country_data_collected=top_10_country_data()
     
     p=plot_ly(top_10_country_data_collected,
-            x=~ISO_NODE_f,
-            y=~values,
-            type="bar")
+              x=~ISO_NODE_f,
+              y=~values,
+              type="bar")%>%
+      layout(xaxis=list(title=""))
+      
     return(p)
   })
   
-
+  
   # top_10_country_EM_data ####
   top_10_country_EM_data=reactive({
     
@@ -359,7 +393,8 @@ server <- shinyServer(function(input, output, session) {
     p=plot_ly(top_10_country_EM_data_collected,
               x=~ISO_NODE_f,
               y=~values,
-              type="bar")
+              type="bar")%>%
+      layout(xaxis=list(title=""))
     return(p)
   })
   
@@ -376,11 +411,17 @@ server <- shinyServer(function(input, output, session) {
                         "net_immigration" = Net_IM,
                         "net_emigration" = Net_EM,
                         "total_migration"=EM_IM)
-    
+
     data_to_map_tm=admin_poly
-    data_to_map_tm@data=collect(admin%>%
-                                  left_join(con_selected,
-                                            by=c("ISO_NODE")))
+    data_to_map_tm@data=admin%>%
+      left_join(con_selected%>%
+                  select(ISO_NODE,total,females,males,females_perc,males_perc),
+                by=c("ISO_NODE"))%>%
+      left_join(ISO,
+                by="ISO")%>%
+      mutate(females_perc=females_perc*100,
+             males_perc=males_perc*100)%>%
+      collect()
     
     return(data_to_map_tm)
   })
@@ -393,9 +434,11 @@ server <- shinyServer(function(input, output, session) {
     field_to_map=input$gender1
     
     labels=sprintf( 
-      paste("<strong>%s</strong><br/>%s", field_to_map),
+      paste("<strong>%s</strong><br/><i>%s</i><br/>%s", field_to_map),
       
-      unlist(data_to_map_collected@data[,"CONT"]),
+      unlist(data_to_map_collected@data[,"country_name"]),
+      
+      unlist(data_to_map_collected@data[,"ISO_NODE"]),
       
       formatC(unlist(data_to_map_collected@data[,field_to_map]),
               format="f",
@@ -423,6 +466,7 @@ server <- shinyServer(function(input, output, session) {
     labels=labels_map1()
     
     p<-leafletProxy("map1")%>%
+      clearShapes() %>%
       addPolygons(data=data_to_map_collected,
                   weight=1,
                   color = "#444444",
@@ -442,7 +486,7 @@ server <- shinyServer(function(input, output, session) {
   ISO_NODE_clicked2=reactive({
     event <- input$map2_shape_click
     
-
+    
     if(is.null(event)){
       event<-data.frame("id"=55)
     }
@@ -455,26 +499,27 @@ server <- shinyServer(function(input, output, session) {
   
   # data_map2 ####
   data_map2=reactive({
+    
     ISO_NODE=switch(input$direction2,  
                     "emigration" = "ISO_NODEI",
-                    "immigration" = "ISO_NODEJ",
-                    "net_immigration" = c("ISO_NODEI","ISO_NODEJ"),
-                    "net_emigration" = c("ISO_NODEJ","ISO_NODEI"),
-                    "total_migration"=c("ISO_NODEI","ISO_NODEJ"))
+                    "immigration" = "ISO_NODEJ")
     
     ISO_NODE_clicked=ISO_NODE_clicked2()
     
     admin_data=gender_mig%>%
       filter((!!sym(ISO_NODE))==ISO_NODE_clicked)%>%
-      select(females,males,total,females_perc,males_perc,ISO_NODEI,ISO_NODEJ)
-    
+      select(females,males,total,females_perc,males_perc,ISO_NODEI,ISO_NODEJ)%>%
+      mutate(females_perc=females_perc*100,
+             males_perc=males_perc*100)
     
     data_to_map_od=admin_poly
     
     data_to_map_od@data=admin%>%
+      left_join(ISO,
+                by="ISO")%>%
       left_join(admin_data,
                 by=c("ISO_NODE"=ISO_NODE))%>%
-      collect()
+    collect()
     
     return(data_to_map_od)
   })
@@ -482,12 +527,19 @@ server <- shinyServer(function(input, output, session) {
   # labels_map2 ####
   labels_map2=reactive({
     
+
     data_to_map_collected=data_map2()
     
     field_to_map=input$gender2
     
+    ISO_NODE_lab=switch(input$direction2,
+                        "emigration"=unlist(data_to_map_collected@data[,"ISO_NODEJ"]),
+                        "immigration"=unlist(data_to_map_collected@data[,"ISO_NODEI"]))
+
     labels=sprintf( 
-      paste("<strong>%s</strong><br/>%s", field_to_map),
+      paste("<strong>%s</strong><br/><i>%s</i><br/>%s", field_to_map),
+      
+      unlist(data_to_map_collected@data[,"CONT"]),
       
       unlist(data_to_map_collected@data[,"CONT"]),
       
@@ -510,6 +562,7 @@ server <- shinyServer(function(input, output, session) {
   
   # Map2 ####
   observe({
+    
     data_to_map_collected=data_map2()
     
     field_to_map=input$gender2
@@ -517,6 +570,7 @@ server <- shinyServer(function(input, output, session) {
     labels=labels_map2()
     
     p<-leafletProxy("map2")%>%
+      clearShapes() %>%
       addPolygons(data=data_to_map_collected,
                   weight=1,
                   color = "#444444",

@@ -7,7 +7,7 @@
 panel_style=tags$head(tags$style(HTML('#PANEL {background-color: rgba(190,190,190,0.5);}')))
 
 # Tab 1
-leaflet_map1=leafletOutput("map1",width="100%",height="1200px")
+leaflet_map1=leafletOutput("map1",width="100%",height="800px")
 
 dropdown_direction1=selectInput("direction1", 
                                 label = "Direction",
@@ -43,15 +43,12 @@ widget_panel1=absolutePanel(top = 50, left = 15,
                             dropdown_basemap1)
 
 # Tab 2
-leaflet_map2=leafletOutput("map2",width="100%",height="1200px")
+leaflet_map2=leafletOutput("map2",width="100%",height="800px")
 
 dropdown_direction2=selectInput("direction2", 
                                 label = "Direction",
                                 choices = c("Emigration"="emigration",
-                                            "Immigration"="immigration",
-                                            "Net immigration"="net_immigration",
-                                            "Net Emigration"="net_emigration",
-                                            "Total migration (in and out)"="total_migration"),
+                                            "Immigration"="immigration"),
                                 selected = "emigration")
 
 dropdown_gender2=selectInput("gender2", 
@@ -83,12 +80,12 @@ global_female_pie=plotlyOutput("global_female_pie")
 
 top_10_total_bar=plotlyOutput("top_10_total_bar")
 checkbox_top_10_total_perc=checkboxInput("top_10_total_perc",
-                                         "as % of population",
+                                         "migrants as % of population",
                                          value = FALSE)
 
 top_10_females_bar=plotlyOutput("top_10_females_bar")
 top_10_females_perc=checkboxInput("top_10_females_perc",
-                                  "as % of migrant",
+                                  "females as % of migrant",
                                   value = FALSE)
 
 country_summary=htmlOutput("country_summary", align="centre")
