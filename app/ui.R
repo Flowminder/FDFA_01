@@ -82,7 +82,7 @@ global_figures=htmlOutput("global_figures", align="left")
 global_female_pie=plotlyOutput("global_female_pie")
 
 top_10_total_bar=plotlyOutput("top_10_total_bar")
-top_10_total_perc=checkboxInput("top_10_total_perc",
+checkbox_top_10_total_perc=checkboxInput("top_10_total_perc",
                                 "as % of population",
                                 value = FALSE)
 
@@ -94,7 +94,14 @@ top_10_females_perc=checkboxInput("top_10_females_perc",
 country_summary=htmlOutput("country_summary", align="centre")
 country_female_pie=plotlyOutput("country_female_pie")
 
-country_bar=plotlyOutput("country_bar")
+top_10_country_dropdown=selectInput("top_10_country_dropdown", 
+                                    label = "",
+                                    choices = c("Number"="number",
+                                                "Proportion of origin area"="perc"),
+                                    selected = "number")
+  
+top_10_country_bar=plotlyOutput("top_10_country_bar")
+
 country_circle=plotOutput("country_circle",width="800px",height = "800px")
 
 # UI structure ####
@@ -110,7 +117,7 @@ ui <- shinyUI(navbarPage("Gender-disaggregated Migration Movements",
                                              global_female_pie),
                                       column(4,
                                              top_10_total_bar,
-                                             top_10_total_perc),
+                                             checkbox_top_10_total_perc),
                                       column(4,
                                              top_10_females_bar,
                                              top_10_females_perc)
@@ -122,9 +129,9 @@ ui <- shinyUI(navbarPage("Gender-disaggregated Migration Movements",
                                       ),
                                       column(5,
                                              fluidRow(country_summary),
-                                             fluidRow(country_female_pie)
-                                             # ,
-                                             # fluidRow(country_bar),
+                                             fluidRow(country_female_pie),
+                                             fluidRow(top_10_country_bar,
+                                                      top_10_country_dropdown)
                                              # fluidRow(country_circle)
 
                                       )

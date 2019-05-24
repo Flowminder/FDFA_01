@@ -242,6 +242,65 @@ server <- shinyServer(function(input, output, session) {
     
   })
   
+  # top_10_country_data ####
+  top_10_country_data=reactive({
+    
+    layerID_clicked1_collected=layerID_clicked1()
+    
+    ISO_clicked1=admin_poly$ISO[layerID_clicked1_collected]
+    
+    n_10_top=IM%>%
+      filter(ISO==ISO_clicked1)%>%
+      distinct(ISO_NODE)%>%
+      summarise(n_to_show=n())%>%
+      mutate(n_to_show=ifelse(n_to_show>10,10,n_to_show))%>%
+      collect()
+    
+    top_mig_count=IM%>%
+      filter(ISO==ISO_clicked1)%>%
+      arrange(desc(total))%>%
+      collect(n=n_10_top$n_to_show)%>%
+      mutate(ISO_NODE_f=factor(1:n_10_top$n_to_show,
+                               labels=ISO_NODE))%>%
+      rename("values"="total")
+    
+    top_mig_perc=IM%>%
+      filter(ISO==ISO_clicked1)%>%
+      left_join(nick_mig%>%
+                  filter(ISOI==ISO_clicked1)%>%
+                  select(ISO_NODEI, POPI)%>%
+                  group_by(ISO_NODEI)%>%
+                  summarise(POP=mean(POPI,na.rm=T))%>%
+                  rename("ISO_NODE"="ISO_NODEI"),
+                by="ISO_NODE")%>%
+      collect()%>%
+      mutate(prop_mig=total/POP)%>%
+      arrange(desc(prop_mig))%>%
+      top_n(n_10_top$n_to_show,prop_mig)%>%
+      mutate(ISO_NODE_f=factor(1:n_10_top$n_to_show,
+                               labels=ISO_NODE))%>%
+      rename("values"="prop_mig")
+    
+    top_10_data=switch(input$top_10_country_dropdown,
+                       "number"=top_mig_count,
+                       "perc"=top_mig_perc)
+    
+    return(top_10_data)
+    
+  })
+  
+  # top_10_country_bar ####
+  output$top_10_country_bar=renderPlotly({
+    
+    top_10_country_data_collected=top_10_country_data()
+    
+    p=plot_ly(top_10_country_data_collected,
+            x=~ISO_NODE_f,
+            y=~values,
+            type="bar")
+    return(p)
+  })
+  
   # data_map1 ####
   data_map1=reactive({
     con_selected=switch(input$direction1, 
@@ -408,8 +467,6 @@ server <- shinyServer(function(input, output, session) {
   })
   
   # movement_type ####
-  
-  # gender_pie ####
   
   # circle_od ####
   
