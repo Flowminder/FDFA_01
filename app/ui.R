@@ -94,13 +94,20 @@ top_10_females_perc=checkboxInput("top_10_females_perc",
 country_summary=htmlOutput("country_summary", align="centre")
 country_female_pie=plotlyOutput("country_female_pie")
 
+top_10_country_bar=plotlyOutput("top_10_country_bar")
 top_10_country_dropdown=selectInput("top_10_country_dropdown", 
                                     label = "",
                                     choices = c("Number"="number",
-                                                "Proportion of origin area"="perc"),
+                                                "Proportion of origin population"="perc"),
                                     selected = "number")
-  
-top_10_country_bar=plotlyOutput("top_10_country_bar")
+
+top_10_country_EM_bar=plotlyOutput("top_10_country_EM_bar")
+top_10_country_EM_dropdown=selectInput("top_10_country_EM_dropdown", 
+                                    label = "",
+                                    choices = c("Number"="number",
+                                                "Proportion of destination population"="perc"),
+                                    selected = "number")
+
 
 country_circle=plotOutput("country_circle",width="800px",height = "800px")
 
@@ -130,10 +137,15 @@ ui <- shinyUI(navbarPage("Gender-disaggregated Migration Movements",
                                       column(5,
                                              fluidRow(country_summary),
                                              fluidRow(country_female_pie),
-                                             fluidRow(top_10_country_bar,
-                                                      top_10_country_dropdown)
-                                             # fluidRow(country_circle)
-
+                                             tabBox(
+                                               title = "Top regions ranked by:", width = NULL,
+                                               tabPanel("Origin of Immigration",
+                                                        fluidRow(top_10_country_bar,
+                                                                 top_10_country_dropdown)),
+                                               tabPanel("Destination of Emigration",
+                                                        fluidRow(top_10_country_EM_bar,
+                                                                 top_10_country_EM_dropdown))
+                                             )
                                       )
                                     )
                                   )

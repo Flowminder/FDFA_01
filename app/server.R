@@ -249,7 +249,7 @@ server <- shinyServer(function(input, output, session) {
     
     ISO_clicked1=admin_poly$ISO[layerID_clicked1_collected]
     
-    n_10_top=IM%>%
+    n_10_top=IM%>% # in order to control for countries with less than 10 admin units
       filter(ISO==ISO_clicked1)%>%
       distinct(ISO_NODE)%>%
       summarise(n_to_show=n())%>%
@@ -267,11 +267,11 @@ server <- shinyServer(function(input, output, session) {
     top_mig_perc=IM%>%
       filter(ISO==ISO_clicked1)%>%
       left_join(nick_mig%>%
-                  filter(ISOI==ISO_clicked1)%>%
-                  select(ISO_NODEI, POPI)%>%
-                  group_by(ISO_NODEI)%>%
+                  filter(ISOJ==ISO_clicked1)%>%
+                  select(ISO_NODEJ, POPI)%>%
+                  group_by(ISO_NODEJ)%>%
                   summarise(POP=mean(POPI,na.rm=T))%>%
-                  rename("ISO_NODE"="ISO_NODEI"),
+                  rename("ISO_NODE"="ISO_NODEJ"),
                 by="ISO_NODE")%>%
       collect()%>%
       mutate(prop_mig=total/POP)%>%
@@ -300,6 +300,71 @@ server <- shinyServer(function(input, output, session) {
             type="bar")
     return(p)
   })
+  
+
+  # top_10_country_EM_data ####
+  top_10_country_EM_data=reactive({
+    
+    layerID_clicked1_collected=layerID_clicked1()
+    
+    ISO_clicked1=admin_poly$ISO[layerID_clicked1_collected]
+    
+    n_10_top=EM%>%
+      filter(ISO==ISO_clicked1)%>%
+      distinct(ISO_NODE)%>%
+      summarise(n_to_show=n())%>%
+      mutate(n_to_show=ifelse(n_to_show>10,10,n_to_show))%>%
+      collect()
+    
+    top_mig_count=EM%>%
+      filter(ISO==ISO_clicked1)%>%
+      arrange(desc(total))%>%
+      collect(n=n_10_top$n_to_show)%>%
+      mutate(ISO_NODE_f=factor(1:n_10_top$n_to_show,
+                               labels=ISO_NODE))%>%
+      rename("values"="total")
+    
+    top_mig_perc=EM%>%
+      filter(ISO==ISO_clicked1)%>%
+      left_join(nick_mig%>%
+                  filter(ISOI==ISO_clicked1)%>%
+                  select(ISO_NODEI, POPJ)%>%
+                  group_by(ISO_NODEI)%>%
+                  summarise(POP=mean(POPJ,na.rm=T))%>%
+                  rename("ISO_NODE"="ISO_NODEI"),
+                by="ISO_NODE")%>%
+      collect()%>%
+      mutate(prop_mig=total/POP)%>%
+      arrange(desc(prop_mig))%>%
+      top_n(n_10_top$n_to_show,prop_mig)%>%
+      mutate(ISO_NODE_f=factor(1:n_10_top$n_to_show,
+                               labels=ISO_NODE))%>%
+      rename("values"="prop_mig")
+    
+    top_10_data=switch(input$top_10_country_EM_dropdown,
+                       "number"=top_mig_count,
+                       "perc"=top_mig_perc)
+    
+    return(top_10_data)
+    
+  })
+  
+  # top_10_country_EM_bar ####
+  output$top_10_country_EM_bar=renderPlotly({
+    
+    top_10_country_EM_data_collected=top_10_country_EM_data()
+    
+    p=plot_ly(top_10_country_EM_data_collected,
+              x=~ISO_NODE_f,
+              y=~values,
+              type="bar")
+    return(p)
+  })
+  
+  
+  
+  
+  
   
   # data_map1 ####
   data_map1=reactive({
