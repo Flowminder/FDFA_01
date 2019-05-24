@@ -83,13 +83,13 @@ global_female_pie=plotlyOutput("global_female_pie")
 
 top_10_total_bar=plotlyOutput("top_10_total_bar")
 checkbox_top_10_total_perc=checkboxInput("top_10_total_perc",
-                                "as % of population",
-                                value = FALSE)
+                                         "as % of population",
+                                         value = FALSE)
 
 top_10_females_bar=plotlyOutput("top_10_females_bar")
 top_10_females_perc=checkboxInput("top_10_females_perc",
-                                "as % of migrant",
-                                value = FALSE)
+                                  "as % of migrant",
+                                  value = FALSE)
 
 country_summary=htmlOutput("country_summary", align="centre")
 country_female_pie=plotlyOutput("country_female_pie")
@@ -103,10 +103,10 @@ top_10_country_dropdown=selectInput("top_10_country_dropdown",
 
 top_10_country_EM_bar=plotlyOutput("top_10_country_EM_bar")
 top_10_country_EM_dropdown=selectInput("top_10_country_EM_dropdown", 
-                                    label = "",
-                                    choices = c("Number"="number",
-                                                "Proportion of destination population"="perc"),
-                                    selected = "number")
+                                       label = "",
+                                       choices = c("Number"="number",
+                                                   "Proportion of destination population"="perc"),
+                                       selected = "number")
 
 
 country_circle=plotOutput("country_circle",width="800px",height = "800px")
@@ -114,52 +114,52 @@ country_circle=plotOutput("country_circle",width="800px",height = "800px")
 # UI structure ####
 ui <- shinyUI(navbarPage("Gender-disaggregated Migration Movements",
                          
-                         tabPanel("Map global",
-                                  fluidPage(
-                                    panel_style,
+                         fluidPage(
+                           panel_style,
+                           
+                           fluidRow(
+                             column(4,
+                                    global_figures,
+                                    global_female_pie),
+                             column(4,
+                                    top_10_total_bar,
+                                    checkbox_top_10_total_perc),
+                             column(4,
+                                    top_10_females_bar,
+                                    top_10_females_perc)
+                           ),
+                           fluidRow(
+                             column(7,
+                                    tabBox(title = "MAP", width = NULL,id = "tabs",
+                                           tabPanel(title="Global movements",
+                                                    value  ="global",
+                                                    fluidRow(leaflet_map1,
+                                                             widget_panel1)),
+                                           tabPanel(title="Origin and destination",
+                                                    value  ="od",
+                                                    fluidRow(leaflet_map2,
+                                                             widget_panel2))
+                                    )
                                     
-                                    fluidRow(
-                                      column(4,
-                                             global_figures,
-                                             global_female_pie),
-                                      column(4,
-                                             top_10_total_bar,
-                                             checkbox_top_10_total_perc),
-                                      column(4,
-                                             top_10_females_bar,
-                                             top_10_females_perc)
-                                    ),
-                                    fluidRow(
-                                      column(7,
-                                             leaflet_map1,
-                                             widget_panel1
-                                      ),
-                                      column(5,
-                                             fluidRow(country_summary),
-                                             fluidRow(country_female_pie),
-                                             tabBox(
-                                               title = "Top regions ranked by:", width = NULL,
-                                               tabPanel("Origin of Immigration",
-                                                        fluidRow(top_10_country_bar,
-                                                                 top_10_country_dropdown)),
-                                               tabPanel("Destination of Emigration",
-                                                        fluidRow(top_10_country_EM_bar,
-                                                                 top_10_country_EM_dropdown))
-                                             )
-                                      )
+                             ),
+                             column(5,
+                                    fluidRow(country_summary),
+                                    fluidRow(country_female_pie),
+                                    tabBox(
+                                      title = "Top regions ranked by:", width = NULL,
+                                      tabPanel("Origin of Immigration",
+                                               fluidRow(top_10_country_bar,
+                                                        top_10_country_dropdown)),
+                                      tabPanel("Destination of Emigration",
+                                               fluidRow(top_10_country_EM_bar,
+                                                        top_10_country_EM_dropdown))
                                     )
-                                  )
-                         ),
-                         tabPanel("Origin destination",
-                                  fluidPage(
-                                    panel_style,
-                                    column(12,
-                                           leaflet_map2,
-                                           widget_panel2
-                                           
-                                    )
-                                  )
+                             )
+                           )
                          )
+                         
+                         
+                         
 )
 )
 

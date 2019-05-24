@@ -149,37 +149,39 @@ server <- shinyServer(function(input, output, session) {
     p
   })
   
-  # ISO_NODE_clicked1 ####
-  layerID_clicked1=reactive({
-    event <- input$map1_shape_click
+  # layerID_clicked ####
+  layerID_clicked=reactive({
     
-    print(event)
-    
+    print(input$tabs)
+    event=switch(input$tabs,
+           "global"=input$map1_shape_click,
+           "od"=input$map2_shape_click)
+
     if(is.null(event)){
       event<-data.frame("id"=55)
     }
     
-    layerID_clicked1=event$id
-    return(layerID_clicked1)
+    layerID_clicked=event$id
+    return(layerID_clicked)
   })
   
   # country_summary_data ####
   country_summary_data=reactive({
     
-    layerID_clicked1_collected=layerID_clicked1()
+    layerID_clicked_collected=layerID_clicked()
     
     
-    ISO_clicked1=admin_poly$ISO[layerID_clicked1_collected]
+    ISO_clicked=admin_poly$ISO[layerID_clicked_collected]
     
     
     country_summary_data=IM%>%
-      filter(ISO==ISO_clicked1)%>%
+      filter(ISO==ISO_clicked)%>%
       group_by(ISO)%>%
       summarise(sum_females=sum(females,na.rm = T),
                 sum_total=sum(total,na.rm = T))%>%
       left_join(POP_ISO_NODE%>%
                   select(ISO,POP)%>%
-                  filter(ISO==ISO_clicked1)%>%
+                  filter(ISO==ISO_clicked)%>%
                   group_by(ISO)%>%
                   summarise(POP=sum(POP,na.rm=T)),
                 by="ISO")%>%
@@ -245,19 +247,19 @@ server <- shinyServer(function(input, output, session) {
   # top_10_country_data ####
   top_10_country_data=reactive({
     
-    layerID_clicked1_collected=layerID_clicked1()
+    layerID_clicked_collected=layerID_clicked()
     
-    ISO_clicked1=admin_poly$ISO[layerID_clicked1_collected]
+    ISO_clicked=admin_poly$ISO[layerID_clicked_collected]
     
     n_10_top=IM%>% # in order to control for countries with less than 10 admin units
-      filter(ISO==ISO_clicked1)%>%
+      filter(ISO==ISO_clicked)%>%
       distinct(ISO_NODE)%>%
       summarise(n_to_show=n())%>%
       mutate(n_to_show=ifelse(n_to_show>10,10,n_to_show))%>%
       collect()
     
     top_mig_count=IM%>%
-      filter(ISO==ISO_clicked1)%>%
+      filter(ISO==ISO_clicked)%>%
       arrange(desc(total))%>%
       collect(n=n_10_top$n_to_show)%>%
       mutate(ISO_NODE_f=factor(1:n_10_top$n_to_show,
@@ -265,9 +267,9 @@ server <- shinyServer(function(input, output, session) {
       rename("values"="total")
     
     top_mig_perc=IM%>%
-      filter(ISO==ISO_clicked1)%>%
+      filter(ISO==ISO_clicked)%>%
       left_join(nick_mig%>%
-                  filter(ISOJ==ISO_clicked1)%>%
+                  filter(ISOJ==ISO_clicked)%>%
                   select(ISO_NODEJ, POPI)%>%
                   group_by(ISO_NODEJ)%>%
                   summarise(POP=mean(POPI,na.rm=T))%>%
@@ -305,19 +307,19 @@ server <- shinyServer(function(input, output, session) {
   # top_10_country_EM_data ####
   top_10_country_EM_data=reactive({
     
-    layerID_clicked1_collected=layerID_clicked1()
+    layerID_clicked_collected=layerID_clicked()
     
-    ISO_clicked1=admin_poly$ISO[layerID_clicked1_collected]
+    ISO_clicked=admin_poly$ISO[layerID_clicked_collected]
     
     n_10_top=EM%>%
-      filter(ISO==ISO_clicked1)%>%
+      filter(ISO==ISO_clicked)%>%
       distinct(ISO_NODE)%>%
       summarise(n_to_show=n())%>%
       mutate(n_to_show=ifelse(n_to_show>10,10,n_to_show))%>%
       collect()
     
     top_mig_count=EM%>%
-      filter(ISO==ISO_clicked1)%>%
+      filter(ISO==ISO_clicked)%>%
       arrange(desc(total))%>%
       collect(n=n_10_top$n_to_show)%>%
       mutate(ISO_NODE_f=factor(1:n_10_top$n_to_show,
@@ -325,9 +327,9 @@ server <- shinyServer(function(input, output, session) {
       rename("values"="total")
     
     top_mig_perc=EM%>%
-      filter(ISO==ISO_clicked1)%>%
+      filter(ISO==ISO_clicked)%>%
       left_join(nick_mig%>%
-                  filter(ISOI==ISO_clicked1)%>%
+                  filter(ISOI==ISO_clicked)%>%
                   select(ISO_NODEI, POPJ)%>%
                   group_by(ISO_NODEI)%>%
                   summarise(POP=mean(POPJ,na.rm=T))%>%
@@ -440,8 +442,7 @@ server <- shinyServer(function(input, output, session) {
   ISO_NODE_clicked2=reactive({
     event <- input$map2_shape_click
     
-    print(event)
-    
+
     if(is.null(event)){
       event<-data.frame("id"=55)
     }

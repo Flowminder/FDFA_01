@@ -1,8 +1,12 @@
 library(shiny)
+library(shinydashboard)
 library(dplyr)
+library(tidyr)
 library(leaflet)
 library(leaflet.extras)
+library(plotly)
 library(rlang)
+
 
 rm(list = ls())
 
@@ -28,6 +32,8 @@ nick_mig =tbl(mig_db, "nick_mig") # "nick_mig" tables: contextual data, Nick's i
 
 Top_perc_mig_ISO=tbl(mig_db, "Top_perc_mig_ISO")
 world_share_mig=tbl(mig_db, "world_share_mig")
+POP_ISO_NODE=tbl(mig_db, "POP_ISO_NODE")
+
 # lauch the app ####
 source(paste0(code_dir,
               "ui.R"))
