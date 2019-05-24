@@ -176,5 +176,39 @@ IM%>%
           y=~prop_mig,
           type="bar")
 
+# country pie female plot
+country_summary=IM%>%
+  filter(ISO=="ARG")%>%
+  group_by(ISO)%>%
+  summarise(sum_females=sum(females,na.rm = T),
+            sum_total=sum(total,na.rm = T))%>%
+  left_join(POP_ISO_NODE%>%
+              select(ISO,POP)%>%
+              filter(ISO=="ARG")%>%
+              group_by(ISO)%>%
+              summarise(POP=sum(POP,na.rm=T)),
+            by="ISO")%>%
+  collect()%>%
+  mutate(females_perc=sum_females/sum_total,
+         mig_perc=sum_total/POP)%>%
+  select(sum_total,females_perc,mig_perc)
 
+data_pie=country_summary%>%
+  mutate(males_perc=1-females_perc)%>%
+  select(females_perc,males_perc)%>%
+  gather(key=key)%>%
+  mutate(labels=factor(2:1,
+                       labels = c("Males","Females")))%>%
+  rename("values"="value")%>%
+  group_by(labels)
 
+plot_ly(data_pie,
+        labels=~labels,
+        values=~values,
+        hoverinfo = "text",
+        marker = list(colors = c(RColorBrewer::brewer.pal(9,"Greens")[7],
+                                 RColorBrewer::brewer.pal(9,"Greens")[2]),
+                      line = list(color = '#FFFFFF', width = 1)))%>%
+  add_pie(hole = 0.6)%>%
+  layout(title=paste0("Proportion Females among Migrants"))
+  
