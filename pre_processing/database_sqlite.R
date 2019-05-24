@@ -9,6 +9,8 @@ table_nick_mig=read.csv("table/combined_df_20180122.csv")
 
 all_admin_light=rgdal::readOGR("spatial/All_AdminUnits_final_simplified/all_admin_simplified.geojson")
 
+ISO=read.delim("table/ISO.txt")
+
 # Emigration movements per admin unit ####
 EM_data=table_gender_mig%>%
   mutate(ISO_NODEI=paste(ISOI,as.integer(NODEI),sep="_"))%>% # ISO_NODEI: origin ISO and 
@@ -248,3 +250,12 @@ copy_to(mig_db,
         temporary = FALSE,
         indexes = list("ISO","ISO_NODE"),
         overwrite = T)
+
+#  add ISO-country_name #####
+copy_to(mig_db,
+        ISO,
+        name="ISO",
+        temporary = FALSE,
+        indexes = list("ISO"),
+        overwrite = T)
+
