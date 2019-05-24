@@ -186,7 +186,30 @@ copy_to(mig_db,
         overwrite = T)
 
 
-# internal migrant number and pop per country ####
+# Share of migrant in total population ####
+world_share_mig=IM%>%
+  group_by(ISO)%>%
+  summarise(sum_total=sum(total,na.rm = T))%>%
+  left_join(nick_mig%>%
+              select(ISOI,ISO_NODEI,POPI)%>%
+              group_by(ISO_NODEI)%>%
+              summarise(POP=mean(POPI,na.rm=T),
+                        ISOI=ISOI)%>%
+              group_by(ISOI)%>%
+              summarise(POP=sum(POP,na.rm=T)),
+            by=c("ISO"="ISOI"))%>%
+  ungroup()%>%
+  summarise(tot_pop=sum(POP,na.rm = T),
+            tot_mig=sum(sum_total,na.rm = T))%>%
+  mutate(mig_share=tot_mig/tot_pop)
+
+copy_to(mig_db,
+        world_share_mig,
+        name="world_share_mig",
+        temporary = FALSE,
+        overwrite = T)
+
+# top 10 countries by migrant share ####
 Top_perc_mig_ISO=IM%>%
   group_by(ISO)%>%
   summarise(sum_total=sum(total,na.rm = T))%>%
@@ -203,10 +226,25 @@ Top_perc_mig_ISO=IM%>%
   arrange(desc(migrant_per_pop))%>%
   top_n(10,migrant_per_pop)
 
-
 copy_to(mig_db,
         Top_perc_mig_ISO,
         name="Top_perc_mig_ISO",
         temporary = FALSE,
         indexes = list("ISO"),
+        overwrite = T)
+
+
+# top 10 countries by migrant share ####
+POP_ISO_NODE=nick_mig%>%
+              select(ISO_NODEI,POPI,ISOI)%>%
+              group_by(ISO_NODEI)%>%
+              summarise(POP=mean(POPI,na.rm=T),
+                        ISO=ISOI)%>%
+  rename("ISO_NODE"="ISO_NODEI")
+
+copy_to(mig_db,
+        POP_ISO_NODE,
+        name="POP_ISO_NODE",
+        temporary = FALSE,
+        indexes = list("ISO","ISO_NODE"),
         overwrite = T)
