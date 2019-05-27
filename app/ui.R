@@ -105,6 +105,19 @@ top_10_country_EM_dropdown=selectInput("top_10_country_EM_dropdown",
                                                    "Proportion of origin population"="perc"),
                                        selected = "number")
 
+dropdown_gender3=selectInput("gender3", 
+                             label = "",
+                             choices = c("Total (females and males)"="total",
+                                         "Females"="females",
+                                         "Males"="males"),
+                             selected = "total")
+dropdown_gender4=selectInput("gender4", 
+                             label = "",
+                             choices = c("Total (females and males)"="total",
+                                         "Females"="females",
+                                         "Males"="males"),
+                             selected = "total")
+
 
 country_circle=plotOutput("country_circle",width="800px",height = "800px")
 
@@ -145,11 +158,14 @@ ui <- shinyUI(navbarPage("Gender-disaggregated Migration Movements",
                                     tabBox(
                                       title = "Top regions ranked by:", width = NULL,
                                       tabPanel("Origin of Immigration",
-                                               fluidRow(top_10_country_bar,
-                                                        top_10_country_dropdown)),
+                                               fluidRow(top_10_country_bar),
+                                               fluidRow(column(6,top_10_country_dropdown),
+                                                        column(6,dropdown_gender3))
+                                                        ),
                                       tabPanel("Destination of Emigration",
                                                fluidRow(top_10_country_EM_bar,
-                                                        top_10_country_EM_dropdown))
+                                                        top_10_country_EM_dropdown,
+                                                        dropdown_gender4))
                                     )
                              )
                            )

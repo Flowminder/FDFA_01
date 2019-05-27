@@ -203,7 +203,6 @@ server <- shinyServer(function(input, output, session) {
     
     ISO_clicked=admin_poly$ISO[layerID_clicked_collected]
     
-    
     country_summary_data=IM%>%
       filter(ISO==ISO_clicked)%>%
       group_by(ISO)%>%
@@ -283,6 +282,9 @@ server <- shinyServer(function(input, output, session) {
     
     ISO_clicked=admin_poly$ISO[layerID_clicked_collected]
     
+
+    gender_selected=input$gender3
+    
     n_10_top=IM%>% # in order to control for countries with less than 10 admin units
       filter(ISO==ISO_clicked)%>%
       distinct(ISO_NODE)%>%
@@ -292,11 +294,11 @@ server <- shinyServer(function(input, output, session) {
     
     top_mig_count=IM%>%
       filter(ISO==ISO_clicked)%>%
-      arrange(desc(total))%>%
+      arrange(desc((!!sym(gender_selected))))%>%
       collect(n=n_10_top$n_to_show)%>%
       mutate(ISO_NODE_f=factor(1:n_10_top$n_to_show,
                                labels=ISO_NODE))%>%
-      rename("values"="total")
+      rename("values"=gender_selected)
     
     top_mig_perc=IM%>%
       filter(ISO==ISO_clicked)%>%
@@ -308,7 +310,7 @@ server <- shinyServer(function(input, output, session) {
                   rename("ISO_NODE"="ISO_NODEJ"),
                 by="ISO_NODE")%>%
       collect()%>%
-      mutate(prop_mig=total/POP)%>%
+      mutate(prop_mig=get(gender_selected)/POP)%>%
       arrange(desc(prop_mig))%>%
       top_n(n_10_top$n_to_show,prop_mig)%>%
       mutate(ISO_NODE_f=factor(1:n_10_top$n_to_show,
@@ -345,6 +347,8 @@ server <- shinyServer(function(input, output, session) {
     
     ISO_clicked=admin_poly$ISO[layerID_clicked_collected]
     
+    gender_selected=input$gender4
+    
     n_10_top=EM%>%
       filter(ISO==ISO_clicked)%>%
       distinct(ISO_NODE)%>%
@@ -354,11 +358,11 @@ server <- shinyServer(function(input, output, session) {
     
     top_mig_count=EM%>%
       filter(ISO==ISO_clicked)%>%
-      arrange(desc(total))%>%
+      arrange(desc((!!sym(gender_selected))))%>%
       collect(n=n_10_top$n_to_show)%>%
       mutate(ISO_NODE_f=factor(1:n_10_top$n_to_show,
                                labels=ISO_NODE))%>%
-      rename("values"="total")
+      rename("values"=gender_selected)
     
     top_mig_perc=EM%>%
       filter(ISO==ISO_clicked)%>%
@@ -370,7 +374,7 @@ server <- shinyServer(function(input, output, session) {
                   rename("ISO_NODE"="ISO_NODEI"),
                 by="ISO_NODE")%>%
       collect()%>%
-      mutate(prop_mig=total/POP)%>%
+      mutate(prop_mig=get(gender_selected)/POP)%>%
       arrange(desc(prop_mig))%>%
       top_n(n_10_top$n_to_show,prop_mig)%>%
       mutate(ISO_NODE_f=factor(1:n_10_top$n_to_show,
