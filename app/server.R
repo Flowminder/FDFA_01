@@ -457,8 +457,8 @@ server <- shinyServer(function(input, output, session) {
                         "net_emigration" = Net_EM,
                         "total_migration"=EM_IM)
     
-    data_to_map_tm=admin_poly
-    data_to_map_tm@data=admin%>%
+    data_to_map_tm=admin_poly_modelled
+    data_to_map_tm@data=admin_modelled%>%
       left_join(con_selected%>%
                   select(ISO_NODE,total,females,males,females_perc,males_perc),
                 by=c("ISO_NODE"))%>%
@@ -522,7 +522,11 @@ server <- shinyServer(function(input, output, session) {
                   labelOptions = labelOptions(
                     style = list("font-weight" = "normal", padding = "3px 8px"),
                     textsize = "15px",
-                    direction = "auto"))
+                    direction = "auto"))%>%
+      addPolylines(data=country_poly_modelled,
+                   weight=2,
+                   opacity = 1,
+                   color = "black")
     
     return(p)
   })
@@ -557,9 +561,9 @@ server <- shinyServer(function(input, output, session) {
       mutate(females_perc=females_perc*100,
              males_perc=males_perc*100)
     
-    data_to_map_od=admin_poly
+    data_to_map_od=admin_poly_modelled
     
-    data_to_map_od@data=admin%>%
+    data_to_map_od@data=admin_modelled%>%
       left_join(ISO,
                 by="ISO")%>%
       left_join(admin_data,
@@ -626,7 +630,11 @@ server <- shinyServer(function(input, output, session) {
                   labelOptions = labelOptions(
                     style = list("font-weight" = "normal", padding = "3px 8px"),
                     textsize = "15px",
-                    direction = "auto"))
+                    direction = "auto"))%>%
+      addPolylines(data=country_poly,
+                   weight=2,
+                   opacity = 1,
+                   color = "black")
     
     return(p)
   })

@@ -9,6 +9,10 @@ table_nick_mig=read.csv("table/combined_df_20180122.csv")
 
 all_admin_light=rgdal::readOGR("spatial/All_AdminUnits_final_simplified/all_admin_simplified.geojson")
 
+admin_poly_modelled=rgdal::readOGR("spatial/All_AdminUnits_final_simplified/admin_poly_modelled.geojson")
+country_poly_modelled=rgdal::readOGR("spatial/All_AdminUnits_final_simplified/countries_poly_modelled.geojson")
+
+
 ISO=read.delim("table/ISO.txt")
 
 # Emigration movements per admin unit ####
@@ -257,5 +261,17 @@ copy_to(mig_db,
         name="ISO",
         temporary = FALSE,
         indexes = list("ISO"),
+        overwrite = T)
+
+#  add admin_poly_modelled #####
+admin_poly_modelled_data=admin_poly_modelled@data
+admin_poly_modelled_data=admin_poly_modelled_data%>%
+  mutate(ISO_NODE=paste0(ISO,"_",IPUMSID))
+
+copy_to(mig_db,
+        admin_poly_modelled_data,
+        name = "admin_poly_modelled",
+        temporary = FALSE,
+        indexes = list("ISO","ISO_NODE"),
         overwrite = T)
 

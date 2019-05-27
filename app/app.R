@@ -15,12 +15,21 @@ setwd("C:/Users/Xavier Vollenweider/Dropbox/FDFA_01/data/")
 code_dir="C:/Users/Xavier Vollenweider/Documents/Flowminder/Migration_FDFA/code/FDFA_01/app/"
 
 # load the shapefile ####
+# admin_poly=rgdal::readOGR("spatial/All_AdminUnits_final_simplified/all_admin_simplified.geojson")
+
 admin_poly=rgdal::readOGR("spatial/All_AdminUnits_final_simplified/all_admin_simplified.geojson")
+country_poly=rgdal::readOGR("spatial/All_AdminUnits_final_simplified/country_poly.geojson")
+
+admin_poly_modelled=rgdal::readOGR("spatial/All_AdminUnits_final_simplified/admin_poly_modelled.geojson")
+country_poly_modelled=rgdal::readOGR("spatial/All_AdminUnits_final_simplified/countries_poly_modelled.geojson")
+
 
 # connections to database ####
 mig_db = src_sqlite("table/mig_db.sqlite3")
 
 admin =tbl(mig_db, "admin") # dataframe from all_admin_simplified=admin_poly
+admin_modelled =tbl(mig_db, "admin_poly_modelled") # dataframe from all_admin_simplified=admin_poly
+
 EM<-tbl(mig_db, "EM") # emigration
 IM =tbl(mig_db, "IM") # immigration
 Net_IM =tbl(mig_db, "Net_IM") # Net immigration
@@ -50,4 +59,5 @@ source(paste0(code_dir,
 source(paste0(code_dir,
               "server.R"))
 shinyApp(ui, server)
+
 
