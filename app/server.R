@@ -282,7 +282,7 @@ server <- shinyServer(function(input, output, session) {
     
     ISO_clicked=admin_poly$ISO[layerID_clicked_collected]
     
-
+    
     gender_selected=input$gender3
     
     n_10_top=IM%>% # in order to control for countries with less than 10 admin units
@@ -310,7 +310,7 @@ server <- shinyServer(function(input, output, session) {
                   rename("ISO_NODE"="ISO_NODEJ"),
                 by="ISO_NODE")%>%
       collect()%>%
-      mutate(prop_mig=get(gender_selected)/POP)%>%
+      mutate(prop_mig=100*get(gender_selected)/POP)%>%
       arrange(desc(prop_mig))%>%
       top_n(n_10_top$n_to_show,prop_mig)%>%
       mutate(ISO_NODE_f=factor(1:n_10_top$n_to_show,
@@ -330,12 +330,33 @@ server <- shinyServer(function(input, output, session) {
     
     top_10_country_data_collected=top_10_country_data()
     
+    gender_selected=input$gender3
+    gender_selected_s=switch(gender_selected,
+                             "total"="\n(total: females + males)",
+                             "females"="\n(females)",
+                             "males"="\n(males)")
+    
+    
+    title_s=switch(input$top_10_country_dropdown,
+                   "number"="number of immigrants",
+                   "perc"="proportion of immigrants in population at destination")
+    
+    yaxis_title_s=switch(input$top_10_country_dropdown,
+                         "number"="count",
+                         "perc"="%")
+    
     p=plot_ly(top_10_country_data_collected,
               x=~ISO_NODE_f,
               y=~values,
               type="bar")%>%
-      layout(xaxis=list(title=""))
-      
+      layout(title=paste0("Top regions according to\n",
+                                     title_s,
+                          gender_selected_s),
+             yaxis=list(title=yaxis_title_s),
+             xaxis=list(title=""),
+             margin=m)
+    
+    
     return(p)
   })
   
@@ -394,11 +415,31 @@ server <- shinyServer(function(input, output, session) {
     
     top_10_country_EM_data_collected=top_10_country_EM_data()
     
+    gender_selected=input$gender4
+    gender_selected_s=switch(gender_selected,
+                             "total"="\n(total: females + males)",
+                             "females"="\n(females)",
+                             "males"="\n(males)")
+    
+    
+    title_s=switch(input$top_10_country_dropdown,
+                   "number"="number of emigrants",
+                   "perc"="proportion of emigrants in population from origin")
+    
+    yaxis_title_s=switch(input$top_10_country_dropdown,
+                         "number"="count",
+                         "perc"="%")
+    
     p=plot_ly(top_10_country_EM_data_collected,
               x=~ISO_NODE_f,
               y=~values,
               type="bar")%>%
-      layout(xaxis=list(title=""))
+      layout(title=paste0("Top regions according to\n",
+                          title_s,
+                          gender_selected_s),
+             yaxis=list(title=yaxis_title_s),
+             xaxis=list(title=""),
+             margin=m)
     return(p)
   })
   
@@ -415,7 +456,7 @@ server <- shinyServer(function(input, output, session) {
                         "net_immigration" = Net_IM,
                         "net_emigration" = Net_EM,
                         "total_migration"=EM_IM)
-
+    
     data_to_map_tm=admin_poly
     data_to_map_tm@data=admin%>%
       left_join(con_selected%>%
@@ -475,7 +516,7 @@ server <- shinyServer(function(input, output, session) {
                   weight=1,
                   color = "#444444",
                   fillOpacity = 1,
-                  fillColor = ~colorQuantile("Greens", get(field_to_map))(get(field_to_map)),
+                  fillColor = ~colorQuantile("Greens", get(field_to_map), na.color = "transparent")(get(field_to_map)),
                   layerId = 1:dim(data_to_map_collected)[1],
                   label = labels,
                   labelOptions = labelOptions(
@@ -523,7 +564,7 @@ server <- shinyServer(function(input, output, session) {
                 by="ISO")%>%
       left_join(admin_data,
                 by=c("ISO_NODE"=ISO_NODE))%>%
-    collect()
+      collect()
     
     return(data_to_map_od)
   })
@@ -531,7 +572,7 @@ server <- shinyServer(function(input, output, session) {
   # labels_map2 ####
   labels_map2=reactive({
     
-
+    
     data_to_map_collected=data_map2()
     
     field_to_map=input$gender2
@@ -539,7 +580,7 @@ server <- shinyServer(function(input, output, session) {
     ISO_NODE_lab=switch(input$direction2,
                         "emigration"=unlist(data_to_map_collected@data[,"ISO_NODEJ"]),
                         "immigration"=unlist(data_to_map_collected@data[,"ISO_NODEI"]))
-
+    
     labels=sprintf( 
       paste("<strong>%s</strong><br/><i>%s</i><br/>%s", field_to_map),
       

@@ -157,12 +157,12 @@ ui <- shinyUI(navbarPage("Gender-disaggregated Migration Movements",
                                     fluidRow(country_female_pie),
                                     tabBox(
                                       title = "Top regions ranked by:", width = NULL,
-                                      tabPanel("Origin of Immigration",
+                                      tabPanel("Immigration",
                                                fluidRow(top_10_country_bar),
                                                fluidRow(column(6,top_10_country_dropdown),
                                                         column(6,dropdown_gender3))
                                                         ),
-                                      tabPanel("Destination of Emigration",
+                                      tabPanel("Emigration",
                                                fluidRow(top_10_country_EM_bar,
                                                         top_10_country_EM_dropdown,
                                                         dropdown_gender4))
