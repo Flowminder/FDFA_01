@@ -95,14 +95,14 @@ top_10_country_bar=plotlyOutput("top_10_country_bar")
 top_10_country_dropdown=selectInput("top_10_country_dropdown", 
                                     label = "",
                                     choices = c("Number"="number",
-                                                "Proportion of origin population"="perc"),
+                                                "Proportion of destination population"="perc"),
                                     selected = "number")
 
 top_10_country_EM_bar=plotlyOutput("top_10_country_EM_bar")
 top_10_country_EM_dropdown=selectInput("top_10_country_EM_dropdown", 
                                        label = "",
                                        choices = c("Number"="number",
-                                                   "Proportion of destination population"="perc"),
+                                                   "Proportion of origin population"="perc"),
                                        selected = "number")
 
 
