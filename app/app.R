@@ -15,11 +15,6 @@ setwd("C:/Users/Xavier Vollenweider/Dropbox/FDFA_01/data/")
 code_dir="C:/Users/Xavier Vollenweider/Documents/Flowminder/Migration_FDFA/code/FDFA_01/app/"
 
 # load the shapefile ####
-# admin_poly=rgdal::readOGR("spatial/All_AdminUnits_final_simplified/all_admin_simplified.geojson")
-
-admin_poly=rgdal::readOGR("spatial/All_AdminUnits_final_simplified/all_admin_simplified.geojson")
-country_poly=rgdal::readOGR("spatial/All_AdminUnits_final_simplified/country_poly.geojson")
-
 admin_poly_modelled=rgdal::readOGR("spatial/All_AdminUnits_final_simplified/admin_poly_modelled.geojson")
 country_poly_modelled=rgdal::readOGR("spatial/All_AdminUnits_final_simplified/countries_poly_modelled.geojson")
 

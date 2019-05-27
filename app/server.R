@@ -201,7 +201,7 @@ server <- shinyServer(function(input, output, session) {
     layerID_clicked_collected=layerID_clicked()
     
     
-    ISO_clicked=admin_poly$ISO[layerID_clicked_collected]
+    ISO_clicked=admin_poly_modelled$ISO[layerID_clicked_collected]
     
     country_summary_data=IM%>%
       filter(ISO==ISO_clicked)%>%
@@ -280,7 +280,7 @@ server <- shinyServer(function(input, output, session) {
     
     layerID_clicked_collected=layerID_clicked()
     
-    ISO_clicked=admin_poly$ISO[layerID_clicked_collected]
+    ISO_clicked=admin_poly_modelled$ISO[layerID_clicked_collected]
     
     
     gender_selected=input$gender3
@@ -366,7 +366,7 @@ server <- shinyServer(function(input, output, session) {
     
     layerID_clicked_collected=layerID_clicked()
     
-    ISO_clicked=admin_poly$ISO[layerID_clicked_collected]
+    ISO_clicked=admin_poly_modelled$ISO[layerID_clicked_collected]
     
     gender_selected=input$gender4
     
@@ -442,10 +442,6 @@ server <- shinyServer(function(input, output, session) {
              margin=m)
     return(p)
   })
-  
-  
-  
-  
   
   
   # data_map1 ####
@@ -526,15 +522,16 @@ server <- shinyServer(function(input, output, session) {
       addPolylines(data=country_poly_modelled,
                    weight=2,
                    opacity = 1,
-                   color = "black")
+                   color = "black",
+                   layerId = 1:dim(data_to_map_collected)[1])
     
     return(p)
   })
   
   # ISO_NODE_clicked2 ####
   ISO_NODE_clicked2=reactive({
-    event <- input$map2_shape_click
     
+    event <- input$map2_shape_click
     
     if(is.null(event)){
       event<-data.frame("id"=55)
@@ -542,18 +539,22 @@ server <- shinyServer(function(input, output, session) {
     
     layerID_selected=event$id
     
-    ISO_NODE_clicked2=admin_poly$ISO_NODE[layerID_selected]
+    ISO_NODE_clicked2=admin_poly_modelled$ISO_NODE[layerID_selected]
+    
+    
+    
     return(ISO_NODE_clicked2)
   })
   
   # data_map2 ####
   data_map2=reactive({
-    
-    ISO_NODE=switch(input$direction2,  
+    ISO_NODE=switch(input$direction2,
                     "emigration" = "ISO_NODEI",
                     "immigration" = "ISO_NODEJ")
-    
+
     ISO_NODE_clicked=ISO_NODE_clicked2()
+    
+    ISO_selected=substring(ISO_NODE_clicked,1,3)
     
     admin_data=gender_mig%>%
       filter((!!sym(ISO_NODE))==ISO_NODE_clicked)%>%
@@ -562,13 +563,17 @@ server <- shinyServer(function(input, output, session) {
              males_perc=males_perc*100)
     
     data_to_map_od=admin_poly_modelled
+    data_to_map_od=data_to_map_od[data_to_map_od$ISO==ISO_selected,]
     
-    data_to_map_od@data=admin_modelled%>%
-      left_join(ISO,
+    data_to_map_od@data=data_to_map_od@data%>%
+      mutate(ISO=as.character(ISO),
+             ISO_NODE=as.character(ISO_NODE))%>%
+      left_join(ISO%>%
+                  collect(),
                 by="ISO")%>%
-      left_join(admin_data,
-                by=c("ISO_NODE"=ISO_NODE))%>%
-      collect()
+      left_join(admin_data%>%
+                  collect(),
+                by=c("ISO_NODE"=ISO_NODE))
     
     return(data_to_map_od)
   })
@@ -576,28 +581,27 @@ server <- shinyServer(function(input, output, session) {
   # labels_map2 ####
   labels_map2=reactive({
     
-    
     data_to_map_collected=data_map2()
-    
+
     field_to_map=input$gender2
-    
+
     ISO_NODE_lab=switch(input$direction2,
                         "emigration"=unlist(data_to_map_collected@data[,"ISO_NODEJ"]),
                         "immigration"=unlist(data_to_map_collected@data[,"ISO_NODEI"]))
-    
-    labels=sprintf( 
+
+    labels=sprintf(
       paste("<strong>%s</strong><br/><i>%s</i><br/>%s", field_to_map),
-      
+
       unlist(data_to_map_collected@data[,"CONT"]),
-      
+
       unlist(data_to_map_collected@data[,"CONT"]),
-      
+
       formatC(unlist(data_to_map_collected@data[,field_to_map]),
               format="f",
               digits=0,
               big.mark="'")
     ) %>% lapply(htmltools::HTML)
-    
+
     return(labels)
     
   })
@@ -613,29 +617,32 @@ server <- shinyServer(function(input, output, session) {
   observe({
     
     data_to_map_collected=data_map2()
+    data_to_map_collected1=data_map1()
     
     field_to_map=input$gender2
     
     labels=labels_map2()
-    
+
     p<-leafletProxy("map2")%>%
       clearShapes() %>%
       addPolygons(data=data_to_map_collected,
                   weight=1,
                   color = "#444444",
                   fillOpacity = 1,
-                  fillColor = ~colorQuantile("Greens", get(field_to_map))(get(field_to_map)),
-                  layerId = 1:dim(data_to_map_collected)[1],
+                  fillColor = ~colorQuantile("Greens", get(field_to_map), na.color = "transparent")(get(field_to_map)),
                   label = labels,
                   labelOptions = labelOptions(
                     style = list("font-weight" = "normal", padding = "3px 8px"),
                     textsize = "15px",
                     direction = "auto"))%>%
-      addPolylines(data=country_poly,
-                   weight=2,
-                   opacity = 1,
-                   color = "black")
-    
+      addPolygons(data=admin_poly_modelled,
+                  weight=1,
+                  color = "black",
+                  fillColor = "transparent",
+                  label =~ISO_NODE,
+                  layerId = 1:dim(data_to_map_collected1)[1])
+      
+
     return(p)
   })
   
