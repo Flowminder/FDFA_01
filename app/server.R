@@ -302,9 +302,9 @@ server <- shinyServer(function(input, output, session) {
       filter(ISO==ISO_clicked)%>%
       left_join(nick_mig%>%
                   filter(ISOJ==ISO_clicked)%>%
-                  select(ISO_NODEJ, POPI)%>%
+                  select(ISO_NODEJ, POPJ)%>%
                   group_by(ISO_NODEJ)%>%
-                  summarise(POP=mean(POPI,na.rm=T))%>%
+                  summarise(POP=mean(POPJ,na.rm=T))%>%
                   rename("ISO_NODE"="ISO_NODEJ"),
                 by="ISO_NODE")%>%
       collect()%>%
@@ -364,9 +364,9 @@ server <- shinyServer(function(input, output, session) {
       filter(ISO==ISO_clicked)%>%
       left_join(nick_mig%>%
                   filter(ISOI==ISO_clicked)%>%
-                  select(ISO_NODEI, POPJ)%>%
+                  select(ISO_NODEI, POPI)%>%
                   group_by(ISO_NODEI)%>%
-                  summarise(POP=mean(POPJ,na.rm=T))%>%
+                  summarise(POP=mean(POPI,na.rm=T))%>%
                   rename("ISO_NODE"="ISO_NODEI"),
                 by="ISO_NODE")%>%
       collect()%>%
