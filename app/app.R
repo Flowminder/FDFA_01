@@ -18,7 +18,6 @@ code_dir="C:/Users/Xavier Vollenweider/Documents/Flowminder/Migration_FDFA/code/
 admin_poly_modelled=rgdal::readOGR("spatial/All_AdminUnits_final_simplified/admin_poly_modelled.geojson")
 country_poly_modelled=rgdal::readOGR("spatial/All_AdminUnits_final_simplified/countries_poly_modelled.geojson")
 
-
 # connections to database ####
 mig_db = src_sqlite("table/mig_db.sqlite3")
 

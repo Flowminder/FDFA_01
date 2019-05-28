@@ -578,6 +578,38 @@ server <- shinyServer(function(input, output, session) {
     return(data_to_map_od)
   })
   
+  
+  # data_map2 ####
+  data_selected_admin=reactive({
+    ISO_NODE=switch(input$direction2,
+                    "emigration" = "ISO_NODEI",
+                    "immigration" = "ISO_NODEJ")
+    
+    ISO_NODE_clicked=ISO_NODE_clicked2()
+    
+    admin_data=gender_mig%>%
+      filter((!!sym(ISO_NODE))==ISO_NODE_clicked)%>%
+      select(females,males,total,females_perc,males_perc,ISO_NODEI,ISO_NODEJ)%>%
+      mutate(females_perc=females_perc*100,
+             males_perc=males_perc*100)
+    
+    data_to_map_od=admin_poly_modelled
+    data_to_map_od=data_to_map_od[data_to_map_od$ISO_NODE==ISO_NODE_clicked,]
+    
+    data_to_map_od@data=data_to_map_od@data%>%
+      mutate(ISO=as.character(ISO),
+             ISO_NODE=as.character(ISO_NODE))%>%
+      left_join(ISO%>%
+                  collect(),
+                by="ISO")%>%
+      left_join(admin_data%>%
+                  collect(),
+                by=c("ISO_NODE"=ISO_NODE))
+    
+    return(data_to_map_od)
+  })
+  
+  
   # labels_map2 ####
   labels_map2=reactive({
     
@@ -618,7 +650,7 @@ server <- shinyServer(function(input, output, session) {
     
     data_to_map_collected=data_map2()
     data_to_map_collected1=data_map1()
-    
+    data_selected_admin=data_selected_admin()
     field_to_map=input$gender2
     
     labels=labels_map2()
@@ -640,7 +672,12 @@ server <- shinyServer(function(input, output, session) {
                   color = "black",
                   fillColor = "transparent",
                   label =~ISO_NODE,
-                  layerId = 1:dim(data_to_map_collected1)[1])
+                  layerId = 1:dim(data_to_map_collected1)[1])%>%
+      addPolygons(data=data_selected_admin,
+                  weight=1,
+                  color = "#444444",
+                  fillOpacity = 1,
+                  fillColor = "red")
       
 
     return(p)
