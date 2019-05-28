@@ -15,6 +15,9 @@ country_poly_modelled=rgdal::readOGR("spatial/All_AdminUnits_final_simplified/co
 
 ISO=read.delim("table/ISO.txt")
 
+world_geolev1=foreign::read.dbf("spatial/world_geolev1/world_geolev1.dbf",as.is=T)
+ISO_code=read.delim("table/ISO-3166-Countries-with-Regional-Codes.txt")
+
 # Emigration movements per admin unit ####
 EM_data=table_gender_mig%>%
   mutate(ISO_NODEI=paste(ISOI,as.integer(NODEI),sep="_"))%>% # ISO_NODEI: origin ISO and 
@@ -271,6 +274,30 @@ admin_poly_modelled_data=admin_poly_modelled_data%>%
 copy_to(mig_db,
         admin_poly_modelled_data,
         name = "admin_poly_modelled",
+        temporary = FALSE,
+        indexes = list("ISO","ISO_NODE"),
+        overwrite = T)
+
+# add admin1 names ####
+admin1_names=world_geolev1%>%
+  mutate(CNTRY_CODE=as.numeric(CNTRY_CODE))%>%
+  select("CNTRY_NAME","ADMIN_NAME","CNTRY_CODE","GEOLEVEL1")%>%
+  left_join(ISO_code%>%
+              select("alpha.3","country.code"),
+            by=c("CNTRY_CODE"="country.code"))%>%
+  mutate(IPUMSID=substring(GEOLEVEL1, 4,6),
+         IPUMSID=as.numeric(IPUMSID))%>%
+  rename("ISO"="alpha.3",
+         "NODE_NAME"="ADMIN_NAME",
+         "country_name"="CNTRY_NAME")%>%
+  select(country_name,NODE_NAME,CNTRY_CODE,ISO,IPUMSID)%>%
+  filter(is.na(IPUMSID)==F)%>%
+  mutate(ISO_NODE=paste0(ISO,"_",IPUMSID))%>%
+  select(ISO,ISO_NODE,country_name,NODE_NAME)
+
+copy_to(mig_db,
+        admin1_names,
+        name = "admin1_names",
         temporary = FALSE,
         indexes = list("ISO","ISO_NODE"),
         overwrite = T)

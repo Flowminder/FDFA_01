@@ -118,6 +118,13 @@ dropdown_gender4=selectInput("gender4",
                                          "Males"="males"),
                              selected = "total")
 
+dropdown_gender5=selectInput("gender5", 
+                             label = "",
+                             choices = c("Total (females and males)"="total",
+                                         "Females"="females",
+                                         "Males"="males"),
+                             selected = "total")
+
 
 chorddiagOutput_1=chorddiagOutput("chorddiagOutput_1",height = "800px")
 
@@ -159,7 +166,8 @@ ui <- shinyUI(navbarPage("Gender-disaggregated Migration Movements",
                                       title = "Top regions ranked by:", width = NULL,
                                       
                                       tabPanel("Chord Diagrams",
-                                               fluidRow(chorddiagOutput_1)
+                                               fluidRow(chorddiagOutput_1),
+                                               fluidRow(dropdown_gender5)
                                       ),
                                       
                                       tabPanel("Immigration",

@@ -677,7 +677,7 @@ server <- shinyServer(function(input, output, session) {
                   weight=1,
                   color = "#444444",
                   fillOpacity = 1,
-                  fillColor = "red")
+                  fillColor = "grey")
       
 
     return(p)
@@ -691,13 +691,15 @@ server <- shinyServer(function(input, output, session) {
     
     ISO_clicked=admin_poly_modelled$ISO[layerID_clicked_collected]
     
+    gender_selected=input$gender5
+    
     arg_db=gender_mig%>%
       filter(ISOI==ISO_clicked)%>%
-      select(ISO_NODEI,ISO_NODEJ,total)%>%
+      select(ISO_NODEI,ISO_NODEJ,gender_selected)%>%
       collect()
     
     mig_data_filter<-as.matrix(as_adjacency_matrix(as_tbl_graph(arg_db),
-                                                   attr = "total"))
+                                                   attr = gender_selected))
     chord<-chorddiag(data = mig_data_filter,
                      groupnamePadding = 30,
                      groupPadding = 3,
