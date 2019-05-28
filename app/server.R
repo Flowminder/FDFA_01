@@ -460,6 +460,9 @@ server <- shinyServer(function(input, output, session) {
                 by=c("ISO_NODE"))%>%
       left_join(ISO,
                 by="ISO")%>%
+      left_join(admin1_names%>%
+                  select(ISO_NODE,NODE_NAME),
+                by="ISO_NODE")%>%
       mutate(females_perc=females_perc*100,
              males_perc=males_perc*100)%>%
       collect()
@@ -479,7 +482,7 @@ server <- shinyServer(function(input, output, session) {
       
       unlist(data_to_map_collected@data[,"country_name"]),
       
-      unlist(data_to_map_collected@data[,"ISO_NODE"]),
+      unlist(data_to_map_collected@data[,"NODE_NAME"]),
       
       formatC(unlist(data_to_map_collected@data[,field_to_map]),
               format="f",

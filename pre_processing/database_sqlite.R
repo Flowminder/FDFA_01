@@ -15,7 +15,6 @@ country_poly_modelled=rgdal::readOGR("spatial/All_AdminUnits_final_simplified/co
 
 ISO=read.delim("table/ISO.txt")
 
-world_geolev1=foreign::read.dbf("spatial/world_geolev1/world_geolev1.dbf",as.is=T)
 ISO_code=read.delim("table/ISO-3166-Countries-with-Regional-Codes.txt")
 
 # Emigration movements per admin unit ####
@@ -278,26 +277,168 @@ copy_to(mig_db,
         indexes = list("ISO","ISO_NODE"),
         overwrite = T)
 
-# add admin1 names ####
-admin1_names=world_geolev1%>%
+# add admin names ####
+
+## unzip admin 1 
+## unzip files downloaded from IMPUM: https://international.ipums.org/international/gis_yrspecific_1st.shtml
+for(i in 1:length(dir("bin/indiv_countries"))){
+  unzip(paste0("bin/indiv_countries/",dir("bin/indiv_countries")[i]),
+        exdir ="C:/Users/Xavier Vollenweider/Dropbox/FDFA_01/data/bin/indiv_countries_unzip")
+}
+# 
+# # unzip admin 2
+# # unzip files downloaded from IMPUM: https://international.ipums.org/international/gis_yrspecific_2nd.shtml
+for(i in 1:length(dir("bin/indiv_countries_adm2"))){
+  unzip(paste0("bin/indiv_countries_adm2/",dir("bin/indiv_countries_adm2")[i]),
+        exdir ="C:/Users/Xavier Vollenweider/Dropbox/FDFA_01/data/bin/indiv_countries_adm2_unzip")
+}
+
+# admin 1 load the DBF from those extracted in indiv_countries_unzip 
+dbf_files=dir("bin/indiv_countries_unzip/")[grep(".dbf",dir("bin/indiv_countries_unzip/"))]
+
+country_set=c()
+for(i in 1:length(dbf_files)){
+  country_file=foreign::read.dbf(paste0("bin/indiv_countries_unzip/",dbf_files[i]),as.is=T)  
+  
+  country_file=country_file[,c("CNTRY_NAME","ADMIN_NAME","CNTRY_CODE",
+                               names(country_file)[grep("IPUM",names(country_file))])]
+  names(country_file)=c("CNTRY_NAME","ADMIN_NAME","CNTRY_CODE","NODE")
+  
+  country_set=country_set%>%
+    bind_rows(country_file)
+}
+head(country_set)
+
+# admin 2 load the DBF from those extracted in indiv_countries_adm2_unzip 
+dbf_files=dir("bin/indiv_countries_adm2_unzip/")[grep(".dbf",dir("bin/indiv_countries_adm2_unzip/"))]
+
+for(i in 1:length(dbf_files)){
+  
+  if(i %in% c(1,2)){ # Mali Sen
+  country_file=foreign::read.dbf(paste0("bin/indiv_countries_adm2_unzip/",dbf_files[i]),as.is=T)  
+  
+  country_file=country_file[,c("CNTRY_NAME","ADMIN_NAME","CNTRY_CODE",
+                               names(country_file)[grep("IPUM",names(country_file))])]
+  names(country_file)=c("CNTRY_NAME","ADMIN_NAME","CNTRY_CODE","NODE_temp")
+  
+  country_file$NODE_lead=as.numeric(substr(country_file$NODE_temp,1,3))
+  country_file$NODE_end=as.numeric(substr(country_file$NODE_temp,4,6))
+  country_file$NODE=paste0(country_file$NODE_lead,country_file$NODE_end)
+  
+  country_file=country_file%>%
+    select("CNTRY_NAME","ADMIN_NAME","CNTRY_CODE","NODE")
+  
+  country_set=country_set%>%
+    bind_rows(country_file)
+  }
+  
+  if(i %in% c(3)){ # ZMB
+    country_file=foreign::read.dbf(paste0("bin/indiv_countries_adm2_unzip/",dbf_files[i]),as.is=T)  
+    
+    country_file=country_file[,c("CNTRY_NAME","ADMIN_NAME","CNTRY_CODE",
+                                 names(country_file)[grep("IPUM",names(country_file))])]
+    names(country_file)=c("CNTRY_NAME","ADMIN_NAME","CNTRY_CODE","NODE_temp")
+    
+    country_file$NODE_lead=as.numeric(substr(country_file$NODE_temp,1,3))
+    country_file$NODE_end=as.numeric(substr(country_file$NODE_temp,4,6))
+    country_file$NODE=paste0(country_file$NODE_lead,0,country_file$NODE_end)
+    country_file$NODE[country_file$NODE%in%c("9010")]="910"
+    country_file$NODE[country_file$NODE%in%c("9011")]="911"
+    country_file=country_file%>%
+      select("CNTRY_NAME","ADMIN_NAME","CNTRY_CODE","NODE")
+    
+    country_set=country_set%>%
+      bind_rows(country_file)
+  }
+}
+
+# adm1 load the DBF from those extracted in a folder 
+sub_dir=list.dirs("bin/indiv_countries_unzip/")
+sub_dir=sub_dir[2:length(sub_dir)]
+
+for(i in 1:length(sub_dir)){
+  
+  dbf_file=dir(sub_dir[i])[grep(".dbf",dir(sub_dir[i]))]
+  
+  country_file=foreign::read.dbf(paste0(sub_dir[i],"/",dbf_file),as.is=T)  
+  
+  country_file=country_file[,c(1:3,
+                               grep("IPUM",names(country_file)))]
+  names(country_file)=c("CNTRY_NAME","ADMIN_NAME","CNTRY_CODE","NODE")
+  
+  country_set=country_set%>%
+    bind_rows(country_file)
+}
+
+# adm2 load the DBF from those extracted in a folder 
+sub_dir=list.dirs("bin/indiv_countries_adm2_unzip/")
+sub_dir=sub_dir[2:length(sub_dir)]
+
+# gender_mig%>%
+#   filter(ISOI=="CMR")%>%
+#   select(ISO_NODEI)%>%
+#   distinct()%>%
+#   arrange(ISO_NODEI)%>%
+#   print(n=100)
+
+for(i in 1:length(sub_dir)){
+  
+  dbf_file=dir(sub_dir[i])[grep(".dbf",dir(sub_dir[i]))]
+  
+  country_file=foreign::read.dbf(paste0(sub_dir[i],"/",dbf_file),as.is=T)  
+  
+  country_file=country_file[,c(1:3,
+                               grep("IPUM",names(country_file)))]
+  names(country_file)=c("CNTRY_NAME","ADMIN_NAME","CNTRY_CODE","NODE_temp")
+  
+  head(country_file)
+  country_file$NODE_lead=as.numeric(substr(country_file$NODE_temp,1,3))
+  country_file$NODE_end=as.numeric(substr(country_file$NODE_temp,4,6))
+  country_file$NODE=paste0(country_file$NODE_lead,0,country_file$NODE_end)
+  str_sub(country_file$NODE[which(nchar(country_file$NODE)>3)],2,2)=""
+  
+  country_file%>%
+    arrange(NODE)%>%
+    select(NODE)
+  country_file=country_file%>%
+    select("CNTRY_NAME","ADMIN_NAME","CNTRY_CODE","NODE")
+  
+  country_set=country_set%>%
+    bind_rows(country_file)
+
+}
+
+admin_names=country_set%>%
   mutate(CNTRY_CODE=as.numeric(CNTRY_CODE))%>%
-  select("CNTRY_NAME","ADMIN_NAME","CNTRY_CODE","GEOLEVEL1")%>%
+  select("CNTRY_NAME","ADMIN_NAME","CNTRY_CODE","NODE")%>%
   left_join(ISO_code%>%
               select("alpha.3","country.code"),
             by=c("CNTRY_CODE"="country.code"))%>%
-  mutate(IPUMSID=substring(GEOLEVEL1, 4,6),
-         IPUMSID=as.numeric(IPUMSID))%>%
+  mutate(NODE=as.numeric(NODE))%>%
   rename("ISO"="alpha.3",
          "NODE_NAME"="ADMIN_NAME",
          "country_name"="CNTRY_NAME")%>%
-  select(country_name,NODE_NAME,CNTRY_CODE,ISO,IPUMSID)%>%
-  filter(is.na(IPUMSID)==F)%>%
-  mutate(ISO_NODE=paste0(ISO,"_",IPUMSID))%>%
+  select(country_name,NODE_NAME,CNTRY_CODE,ISO,NODE)%>%
+  filter(is.na(NODE)==F)%>%
+  mutate(ISO_NODE=paste0(ISO,"_",NODE))%>%
   select(ISO,ISO_NODE,country_name,NODE_NAME)
 
+
+gender_mig%>%
+  select(ISO_NODEI)%>%
+  rename("ISO_NODE"="ISO_NODEI")%>%
+  distinct(ISO_NODE)%>%
+  collect()%>%
+  left_join(admin_names,
+            by="ISO_NODE")%>%
+  filter(is.na(NODE_NAME)==T)%>%
+  mutate(country=substr(ISO_NODE,1,3))%>%
+  distinct(country)%>%
+  print(n=400)
+
 copy_to(mig_db,
-        admin1_names,
-        name = "admin1_names",
+        admin_names,
+        name = "admin_names",
         temporary = FALSE,
         indexes = list("ISO","ISO_NODE"),
         overwrite = T)

@@ -9,6 +9,7 @@ library(rlang)
 library(chorddiag) # devtools::install_github("mattflor/chorddiag")
 library(igraph)
 library(tidygraph)
+library(stringr)
 
 rm(list = ls())
 
@@ -40,7 +41,7 @@ world_share_mig=tbl(mig_db, "world_share_mig")
 POP_ISO_NODE=tbl(mig_db, "POP_ISO_NODE")
 
 ISO=tbl(mig_db, "ISO")
-admin1_names=tbl(mig_db, "admin1_names")
+admin1_names=tbl(mig_db, "admin_names")
 
 m <- list( # plot margins
   l = 50,
