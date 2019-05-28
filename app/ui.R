@@ -119,7 +119,7 @@ dropdown_gender4=selectInput("gender4",
                              selected = "total")
 
 
-country_circle=plotOutput("country_circle",width="800px",height = "800px")
+chorddiagOutput_1=chorddiagOutput("chorddiagOutput_1",height = "800px")
 
 # UI structure ####
 ui <- shinyUI(navbarPage("Gender-disaggregated Migration Movements",
@@ -139,7 +139,7 @@ ui <- shinyUI(navbarPage("Gender-disaggregated Migration Movements",
                                     top_10_females_perc)
                            ),
                            fluidRow(
-                             column(7,
+                             column(6,
                                     tabBox(title = "MAP", width = NULL,id = "tabs",
                                            tabPanel(title="Global movements",
                                                     value  ="global",
@@ -152,11 +152,16 @@ ui <- shinyUI(navbarPage("Gender-disaggregated Migration Movements",
                                     )
                                     
                              ),
-                             column(5,
+                             column(6,
                                     fluidRow(country_summary),
                                     fluidRow(country_female_pie),
                                     tabBox(
                                       title = "Top regions ranked by:", width = NULL,
+                                      
+                                      tabPanel("Chord Diagrams",
+                                               fluidRow(chorddiagOutput_1)
+                                      ),
+                                      
                                       tabPanel("Immigration",
                                                fluidRow(top_10_country_bar),
                                                fluidRow(column(6,top_10_country_dropdown),

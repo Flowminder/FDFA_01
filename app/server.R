@@ -683,10 +683,33 @@ server <- shinyServer(function(input, output, session) {
     return(p)
   })
   
-  # movement_type ####
-  
-  # circle_od ####
-  
+  # chorddiagOutput_1 ####
+  output$chorddiagOutput_1=renderChorddiag({
+    
+    layerID_clicked_collected=layerID_clicked()
+    
+    
+    ISO_clicked=admin_poly_modelled$ISO[layerID_clicked_collected]
+    
+    arg_db=gender_mig%>%
+      filter(ISOI==ISO_clicked)%>%
+      select(ISO_NODEI,ISO_NODEJ,total)%>%
+      collect()
+    
+    mig_data_filter<-as.matrix(as_adjacency_matrix(as_tbl_graph(arg_db),
+                                                   attr = "total"))
+    chord<-chorddiag(data = mig_data_filter,
+                     groupnamePadding = 30,
+                     groupPadding = 3,
+                     # groupColors = c("#ffffe5","#fff7bc","#fee391","#fec44f","#fe9929","#ec7014","#cc4c02","#8c2d04"),
+                     groupnameFontsize = 13 ,
+                     showTicks = FALSE,
+                     margin=150,
+                     tooltipGroupConnector = "    &#x25B6;    ",
+                     chordedgeColor = "#B3B6B7"
+    )
+    chord
+  })
   # od_bar ####
   
   # od_bar_title ####

@@ -6,7 +6,9 @@ library(leaflet)
 library(leaflet.extras)
 library(plotly)
 library(rlang)
-
+library(chorddiag) # devtools::install_github("mattflor/chorddiag")
+library(igraph)
+library(tidygraph)
 
 rm(list = ls())
 
