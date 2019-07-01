@@ -180,25 +180,36 @@ server <- shinyServer(function(input, output, session) {
     p
   })
   
-  # layerID_clicked ####
-  layerID_clicked=reactive({
+  # layerID_clicked1 ####
+  layerID_clicked1=reactive({
     
-    event=switch(input$tabs,
-                 "global"=input$map1_shape_click,
-                 "od"=input$map2_shape_click)
+    event=input$map1_shape_click
     
     if(is.null(event)){
       event<-data.frame("id"=55)
     }
     
-    layerID_clicked=event$id
-    return(layerID_clicked)
+    layerID_clicked1=event$id
+    return(layerID_clicked1)
+  })
+  
+  # layerID_clicked2 ####
+  layerID_clicked2=reactive({
+    
+    event=input$map2_shape_click
+    
+    if(is.null(event)){
+      event<-data.frame("id"=55)
+    }
+    
+    layerID_clicked2=event$id
+    return(layerID_clicked2)
   })
   
   # country_summary_data ####
   country_summary_data=reactive({
     
-    layerID_clicked_collected=layerID_clicked()
+    layerID_clicked_collected=layerID_clicked1()
     
     
     ISO_clicked=admin_poly_modelled$ISO[layerID_clicked_collected]
@@ -278,7 +289,7 @@ server <- shinyServer(function(input, output, session) {
   # top_10_country_data ####
   top_10_country_data=reactive({
     
-    layerID_clicked_collected=layerID_clicked()
+    layerID_clicked_collected=layerID_clicked1()
     
     ISO_clicked=admin_poly_modelled$ISO[layerID_clicked_collected]
     
@@ -364,7 +375,7 @@ server <- shinyServer(function(input, output, session) {
   # top_10_country_EM_data ####
   top_10_country_EM_data=reactive({
     
-    layerID_clicked_collected=layerID_clicked()
+    layerID_clicked_collected=layerID_clicked1()
     
     ISO_clicked=admin_poly_modelled$ISO[layerID_clicked_collected]
     
@@ -641,6 +652,36 @@ server <- shinyServer(function(input, output, session) {
     
   })
   
+  
+  # title_map2 ####
+  title_map2_data=reactive({
+    
+    layerID_clicked_collected=layerID_clicked2()
+
+    ISO_clicked=admin_poly_modelled$ISO[layerID_clicked_collected]
+    
+    country_name=ISO%>%
+      filter(ISO==ISO_clicked)%>%
+      collect()
+    
+    return(country_name)
+  })
+  
+  # title_map2 #####
+  output$title_map2=renderUI({
+    title_map2_data_collected=title_map2_data()
+    
+    HTML(paste0("<h2>",
+                "<strong>","Country Selected: ",
+                "</strong>",
+                title_map2_data_collected,
+                "</h2>",
+                sep = '<br/>'
+    ))
+    
+  })
+  
+  
   # Map2: base map ####
   output$map2<-renderLeaflet({
     leaflet() %>%
@@ -689,7 +730,7 @@ server <- shinyServer(function(input, output, session) {
   # chorddiagOutput_1 ####
   output$chorddiagOutput_1=renderChorddiag({
     
-    layerID_clicked_collected=layerID_clicked()
+    layerID_clicked_collected=layerID_clicked2()
     
     
     ISO_clicked=admin_poly_modelled$ISO[layerID_clicked_collected]

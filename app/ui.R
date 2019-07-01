@@ -43,6 +43,7 @@ widget_panel1=absolutePanel(top = 50, left = 15,
                             dropdown_basemap1)
 
 # Tab 2
+title_map2_html=htmlOutput("title_map2", align="centre")
 leaflet_map2=leafletOutput("map2",width="100%",height="800px")
 
 dropdown_direction2=selectInput("direction2", 
@@ -147,45 +148,37 @@ ui <- shinyUI(navbarPage("Gender-disaggregated Migration Movements",
                            ),
                            fluidRow(
                              column(6,
-                                    tabBox(title = "MAP", width = NULL,id = "tabs",
-                                           tabPanel(title="Global movements",
-                                                    value  ="global",
-                                                    fluidRow(leaflet_map1,
-                                                             widget_panel1)),
-                                           tabPanel(title="Origin and destination",
-                                                    value  ="od",
-                                                    fluidRow(leaflet_map2,
-                                                             widget_panel2))
-                                    )
-                                    
-                             ),
+                                    fluidRow(leaflet_map1,
+                                             widget_panel1)
+                                    ),
                              column(6,
                                     fluidRow(country_summary),
                                     fluidRow(country_female_pie),
                                     tabBox(
                                       title = "Top regions ranked by:", width = NULL,
                                       
-                                      tabPanel("Chord Diagrams",
-                                               fluidRow(chorddiagOutput_1),
-                                               fluidRow(dropdown_gender5)
-                                      ),
-                                      
                                       tabPanel("Immigration",
                                                fluidRow(top_10_country_bar),
                                                fluidRow(column(6,top_10_country_dropdown),
                                                         column(6,dropdown_gender3))
-                                                        ),
+                                      ),
                                       tabPanel("Emigration",
                                                fluidRow(top_10_country_EM_bar,
                                                         top_10_country_EM_dropdown,
                                                         dropdown_gender4))
                                     )
                              )
+                           ),
+                           fluidRow(
+                             column(6,
+                                    fluidRow(title_map2_html,
+                                             leaflet_map2,
+                                             widget_panel2)
+                                    ),
+                             column(6,
+                                    fluidRow(chorddiagOutput_1),
+                                    fluidRow(dropdown_gender5))
+                             )
                            )
-                         )
-                         
-                         
-                         
 )
 )
-
