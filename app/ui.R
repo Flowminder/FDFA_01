@@ -171,7 +171,8 @@ ui <- shinyUI(navbarPage("Gender-disaggregated Migration Movements",
                            ),
                            fluidRow(
                              column(6,
-                                    fluidRow(title_map2_html,
+                                    fluidRow(
+                                      title_map2_html,
                                              leaflet_map2,
                                              widget_panel2)
                                     ),

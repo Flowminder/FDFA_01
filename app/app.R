@@ -18,8 +18,11 @@ setwd("C:/Users/Xavier Vollenweider/Dropbox/FDFA_01/data/")
 code_dir="C:/Users/Xavier Vollenweider/Documents/Flowminder/Migration_FDFA/code/FDFA_01/app/"
 
 # load the shapefile ####
-admin_poly_modelled=rgdal::readOGR("spatial/All_AdminUnits_final_simplified/admin_poly_modelled.geojson")
-country_poly_modelled=rgdal::readOGR("spatial/All_AdminUnits_final_simplified/countries_poly_modelled.geojson")
+admin_poly_modelled=rgdal::readOGR("spatial/AdminUnits_simplified/AdminUnits_simplified.geojson")
+
+
+country_poly_modelled=rgdal::readOGR("bin/country_poly_modelled_admin_ISO.shp")
+
 
 # connections to database ####
 mig_db = src_sqlite("table/mig_db.sqlite3")
@@ -41,7 +44,7 @@ world_share_mig=tbl(mig_db, "world_share_mig")
 POP_ISO_NODE=tbl(mig_db, "POP_ISO_NODE")
 
 ISO=tbl(mig_db, "ISO")
-admin1_names=tbl(mig_db, "admin_names")
+admin1_names=tbl(mig_db, "admin_names_temp")
 
 m <- list( # plot margins
   l = 50,
