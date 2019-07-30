@@ -638,20 +638,42 @@ server <- shinyServer(function(input, output, session) {
 
     data_to_map_collected=data_map2()
     field_to_map=input$gender2
+    
 
-
+    admin_poly_modelled_lab=admin_poly_modelled
+    admin_poly_modelled_lab@data=admin_poly_modelled_lab@data%>%
+      left_join(admin1_names%>%
+                  collect(n=Inf),
+                by="ISO_NODE")%>%
+      left_join(data_to_map_collected@data%>%
+                  select(ISO_NODE,(!!sym(field_to_map))))
+      
+    
     labels=sprintf(
       paste("<strong>%s</strong><br/><i>%s</i><br/>%s", field_to_map),
-
-      unlist(data_to_map_collected@data[,"country_name"]),
-
-      unlist(data_to_map_collected@data[,"NODE_NAME"]),
-
-      formatC(unlist(data_to_map_collected@data[,field_to_map]),
+      
+      unlist(admin_poly_modelled_lab@data[,"country_name"]),
+      
+      unlist(admin_poly_modelled_lab@data[,"NODE_NAME"]),
+      
+      formatC(unlist(admin_poly_modelled_lab@data[,field_to_map]),
               format="f",
               digits=0,
               big.mark="'")
     ) %>% lapply(htmltools::HTML)
+    
+    # labels=sprintf(
+    #   paste("<strong>%s</strong><br/><i>%s</i><br/>%s", field_to_map),
+    # 
+    #   unlist(data_to_map_collected@data[,"country_name"]),
+    # 
+    #   unlist(data_to_map_collected@data[,"NODE_NAME"]),
+    # 
+    #   formatC(unlist(data_to_map_collected@data[,field_to_map]),
+    #           format="f",
+    #           digits=0,
+    #           big.mark="'")
+    # ) %>% lapply(htmltools::HTML)
     
     return(labels)
 
@@ -715,17 +737,17 @@ server <- shinyServer(function(input, output, session) {
                   weight=1,
                   color = "#444444",
                   fillOpacity = 1,
-                  fillColor = ~colorQuantile("Greens", get(field_to_map), na.color = "transparent")(get(field_to_map)),
+                  fillColor = ~colorQuantile("Greens", get(field_to_map), na.color = "transparent")(get(field_to_map)))%>%
+      addPolygons(data=admin_poly_modelled,
+                  weight=1,
+                  color = "black",
+                  fillColor = "transparent",
+                  layerId = 1:dim(data_to_map_collected1)[1],
                   label = labels2,
                   labelOptions = labelOptions(
                     style = list("font-weight" = "normal", padding = "3px 8px"),
                     textsize = "15px",
                     direction = "auto"))%>%
-      addPolygons(data=admin_poly_modelled,
-                  weight=1,
-                  color = "black",
-                  fillColor = "transparent",
-                  layerId = 1:dim(data_to_map_collected1)[1])%>%
       addPolygons(data=data_selected_admin,
                   weight=1,
                   color = "#444444",
