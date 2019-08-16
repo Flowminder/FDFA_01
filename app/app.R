@@ -10,19 +10,25 @@ library(chorddiag) # devtools::install_github("mattflor/chorddiag")
 library(igraph)
 library(tidygraph)
 library(stringr)
+library(rgdal)
 
 rm(list = ls())
 
 # set the directories ####
-setwd("C:/Users/Xavier Vollenweider/Dropbox/FDFA_01/data/")
-code_dir="C:/Users/Xavier Vollenweider/Documents/Flowminder/Migration_FDFA/code/FDFA_01/app/"
+# setwd("C:/Users/Xavier Vollenweider/Dropbox/FDFA_01/data/")
+# code_dir="C:/Users/Xavier Vollenweider/Documents/Flowminder/Migration_FDFA/code/FDFA_01/app/"
+
+setwd("/Users/vishva/Dropbox/FDFA_01/data/")  # VS ***
+code_dir= "/Users/vishva/Desktop/FDFA_Local/FDFA_01/app/"  #VS ****
 
 # load the shapefile ####
-admin_poly_modelled=rgdal::readOGR("spatial/AdminUnits_simplified/AdminUnits_simplified.geojson")
-
+admin_poly_modelled=rgdal::readOGR("spatial/All_AdminUnits_final_simplified/all_admin_simplified.geojson")
 
 country_poly_modelled=rgdal::readOGR("bin/country_poly_modelled_admin_ISO.shp")
 
+# Load the migration csv
+
+int_mig_sub=read.csv("table/combined_df_20180122.csv")
 
 # connections to database ####
 mig_db = src_sqlite("table/mig_db.sqlite3")
@@ -46,6 +52,8 @@ POP_ISO_NODE=tbl(mig_db, "POP_ISO_NODE")
 ISO=tbl(mig_db, "ISO")
 admin1_names=tbl(mig_db, "admin_names_temp")
 
+names(mig_db)
+
 m <- list( # plot margins
   l = 50,
   r = 50,
@@ -60,5 +68,3 @@ source(paste0(code_dir,
 source(paste0(code_dir,
               "server.R"))
 shinyApp(ui, server)
-
-

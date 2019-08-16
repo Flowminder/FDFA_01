@@ -42,6 +42,7 @@ widget_panel1=absolutePanel(top = 50, left = 15,
                             dropdown_gender1,
                             dropdown_basemap1)
 
+
 # Tab 2
 title_map2_html=htmlOutput("title_map2", align="centre")
 leaflet_map2=leafletOutput("map2",width="100%",height="800px")
@@ -129,7 +130,16 @@ dropdown_gender5=selectInput("gender5",
 
 chorddiagOutput_1=chorddiagOutput("chorddiagOutput_1",height = "800px")
 
+
+title_map3_html=htmlOutput("title_map3", align="centre")
+
+leaflet_map3=leafletOutput("map3",width="100%",height="400px")
+
+render_treemap1 =  plotOutput("Treemap", width = "80%", height = "700px")
+
+
 # UI structure ####
+
 ui <- shinyUI(navbarPage("Gender-disaggregated Migration Movements",
                          
                          fluidPage(
@@ -179,7 +189,23 @@ ui <- shinyUI(navbarPage("Gender-disaggregated Migration Movements",
                              column(6,
                                     fluidRow(chorddiagOutput_1),
                                     fluidRow(dropdown_gender5))
-                             )
+                             ),
+                           fluidRow(
+                             column(6,
+                                    fluidRow(
+                                      title_map3_html,
+                                             leaflet_map3)
+                                    )),
+                           fluidRow(
+                             column(12,
+                                    fluidRow(
+                                      render_treemap1
+                                    )
+                           )
+                              
+                           
                            )
 )
 )
+)
+

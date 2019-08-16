@@ -365,7 +365,7 @@ server <- shinyServer(function(input, output, session) {
               y=~values,
               type="bar")%>%
       layout(title=paste0("Top regions according to\n",
-                                     title_s,
+                          title_s,
                           gender_selected_s),
              yaxis=list(title=yaxis_title_s),
              xaxis=list(title=""),
@@ -575,9 +575,9 @@ server <- shinyServer(function(input, output, session) {
   # data_map2 ####
   data_map2=reactive({
     ISO_NODE_S=switch(input$direction2,
-                    "emigration" = "ISO_NODEI",
-                    "immigration" = "ISO_NODEJ")
-
+                      "emigration" = "ISO_NODEI",
+                      "immigration" = "ISO_NODEJ")
+    
     ISO_NODE_clicked=ISO_NODE_clicked2()
     ISO_selected=substring(ISO_NODE_clicked,1,3)
     
@@ -604,7 +604,7 @@ server <- shinyServer(function(input, output, session) {
                   select(ISO_NODE,NODE_NAME)%>%
                   collect(),
                 by=c("ISO_NODE"="ISO_NODE"))
-
+    
     return(data_to_map_od)
   })
   
@@ -612,11 +612,11 @@ server <- shinyServer(function(input, output, session) {
   # data_selected_admin ####
   data_selected_admin2=reactive({
     ISO_NODE_S=switch(input$direction2,
-                    "emigration" = "ISO_NODEI",
-                    "immigration" = "ISO_NODEJ")
-
+                      "emigration" = "ISO_NODEI",
+                      "immigration" = "ISO_NODEJ")
+    
     ISO_NODE_clicked=ISO_NODE_clicked2()
-
+    
     data_to_map_od=admin_poly_modelled # polygon of the admin unit
     data_to_map_od=subset(data_to_map_od,
                           data_to_map_od$ISO_NODE==ISO_NODE_clicked)
@@ -628,18 +628,18 @@ server <- shinyServer(function(input, output, session) {
                   select(ISO_NODE,NODE_NAME)%>%
                   collect(),
                 by=c(ISO_NODE="ISO_NODE"))
-
+    
     return(data_to_map_od)
   })
   
   
   # labels_map2 ####
   labels_map2=reactive({
-
+    
     data_to_map_collected=data_map2()
     field_to_map=input$gender2
     
-
+    
     admin_poly_modelled_lab=admin_poly_modelled
     admin_poly_modelled_lab@data=admin_poly_modelled_lab@data%>%
       left_join(admin1_names%>%
@@ -647,7 +647,7 @@ server <- shinyServer(function(input, output, session) {
                 by="ISO_NODE")%>%
       left_join(data_to_map_collected@data%>%
                   select(ISO_NODE,(!!sym(field_to_map))))
-      
+    
     
     labels=sprintf(
       paste("<strong>%s</strong><br/><i>%s</i><br/>%s", field_to_map),
@@ -676,28 +676,28 @@ server <- shinyServer(function(input, output, session) {
     # ) %>% lapply(htmltools::HTML)
     
     return(labels)
-
+    
   })
   
   
   # # title_map2_data ####
   title_map2_data=reactive({
-
+    
     layerID_clicked_collected=layerID_clicked2()
-
+    
     ISO_clicked=admin_poly_modelled$ISO[layerID_clicked_collected]
-
+    
     country_name=ISO%>%
       filter(ISO==ISO_clicked)%>%
       collect()
-
+    
     return(country_name)
   })
-
+  
   # title_map2 #####
   output$title_map2=renderUI({
     title_map2_data_collected=title_map2_data()
-
+    
     HTML(paste0("<h2>",
                 "<strong>","Country Selected: ",
                 "</strong>",
@@ -705,7 +705,7 @@ server <- shinyServer(function(input, output, session) {
                 "</h2>",
                 sep = '<br/>'
     ))
-
+    
   })
   
   
@@ -718,14 +718,14 @@ server <- shinyServer(function(input, output, session) {
   
   # Map2 ####
   observe({
-
+    
     data_to_map_collected=data_map2()
     data_selected_admin=data_selected_admin2()
     field_to_map=input$gender2
     data_to_map_collected1=admin_poly_modelled
-
+    
     labels2=labels_map2()
-
+    
     p=leafletProxy("map2")%>%
       clearShapes()%>%
       addPolylines(data=country_poly_modelled,
@@ -754,20 +754,20 @@ server <- shinyServer(function(input, output, session) {
                   fillOpacity = 1,
                   fillColor = "grey",
                   label=htmltools::HTML(paste0("<strong>Selected admin</strong><br/><i>",data_selected_admin$NODE_NAME,"</i>")))
-
+    
     return(p)
   })
-
+  
   # # chorddiagOutput_1 ####
   output$chorddiagOutput_1=renderChorddiag({
-
+    
     layerID_clicked_collected=layerID_clicked2()
-
-
+    
+    
     ISO_clicked=admin_poly_modelled$ISO[layerID_clicked_collected]
-
+    
     gender_selected=input$gender5
-
+    
     arg_db=gender_mig%>%
       filter(ISOI==ISO_clicked)%>%
       select(ISO_NODEI,ISO_NODEJ,gender_selected)%>%
@@ -780,7 +780,7 @@ server <- shinyServer(function(input, output, session) {
       mutate(ISO_NODEJ=NODE_NAME)%>%
       select(ISO_NODEI,ISO_NODEJ,gender_selected)%>%
       collect()
-
+    
     mig_data_filter<-as.matrix(as_adjacency_matrix(as_tbl_graph(arg_db),
                                                    attr = gender_selected))
     chord<-chorddiag(data = mig_data_filter,
@@ -796,4 +796,158 @@ server <- shinyServer(function(input, output, session) {
     chord
   })
 
+  # # title_map3_data ####
+  
+  
+  title_map3_data=reactive({
+    
+    layerID_clicked_collected=layerID_clicked3()
+    
+    ISO_clicked=admin_poly_modelled$ISO[layerID_clicked_collected]
+    
+    country_name=ISO%>%
+      filter(ISO==ISO_clicked)%>%
+      collect()
+    return(country_name)
+  })
+  
+  
+  #title_map3#### 
+  output$title_map3=renderUI({
+    title_map3_data_collected=title_map3_data()
+    
+    HTML(paste0("<h2>",
+                "<strong>","Nation Selected: ",
+                "</strong>",
+                title_map3_data_collected,
+                "</h2>",
+                sep = '<br/>'
+    ))
+    
+  })
+
+  ## ISO_NODE_clicked 3  ####
+  layerID_clicked3=reactive({
+    event=input$map3_shape_click
+
+    if(is.null(event)){
+      event<-data.frame("id"=200)
+    }
+
+    layerID_clicked3=event$id
+
+    return(layerID_clicked3)
+
+  })
+
+  
+   ## Data_map3
+  admin_data_selected=reactive({
+
+    ISO_NODE_s=admin_poly_modelled@data$ISO_NODE[layerID_clicked3()] # clicked ISO_NODE
+
+    int_mig_sub_NODE=int_mig_sub%>% # migration data for the clicked ISO_NODE
+      mutate(ISO_NODEJ=paste0(ISOJ,"_",NODEJ))%>%
+      filter(ISO_NODEJ==ISO_NODE_s) %>%
+      mutate(ISO_NODE = paste0(ISOI,"_",NODEI)) %>%
+      select(ISO_NODEJ,ISO_NODE, INTMIGIJ) %>%
+      arrange(desc(INTMIGIJ)) %>%
+      collect()
+
+    admin_data_selected=admin_poly_modelled
+
+
+    admin_data_selected@data=admin_data_selected@data%>%    #merging the specific region to the aggregate shape file
+      mutate(ISO_NODE=as.character(ISO_NODE))%>%
+      left_join(int_mig_sub_NODE,
+                by=c("ISO_NODE"))
+
+    return(admin_data_selected)
+
+  })
+
+  # Map3: Base Map
+  Selected_Node=reactive({
+    ISO_NODE_s=admin_poly_modelled@data$ISO_NODE[layerID_clicked3()]
+    Selected_Node=subset(admin_poly_modelled,
+                         admin_poly_modelled@data$ISO_NODE==ISO_NODE_s)
+    return(Selected_Node)
+  })
+
+
+  # map 3 #####
+
+  observe({
+
+    print(admin_poly_modelled@data$ISO_NODE[layerID_clicked3()])
+
+    Selected_Node_dta=Selected_Node()
+    admin_data_selected_dta=admin_data_selected()
+
+
+    mypalette = colorNumeric(palette="Greens", domain=admin_poly_modelled@data$INTMIGIJ, na.color="transparent")
+    Hovertext=paste("ISO_Node: ", admin_poly_modelled@data$ISO_NODE,"<br/>",
+                    "Outward Migration to Dest: ",admin_poly_modelled@data$INTMIGIJ, sep="") %>%
+    lapply(htmltools::HTML)
+
+
+
+    p=leafletProxy('map3')%>%
+      clearShapes()  %>%
+      addPolygons(data=admin_data_selected_dta,
+                  stroke = F,
+                  fillOpacity = 0.5,
+                  fillColor = ~mypalette(admin_data_selected_dta@data$INTMIGIJ),
+                  label = Hovertext,
+                  layerId = ~1:dim(admin_data_selected_dta)[1]) %>%
+      addPolygons(data=Selected_Node_dta,
+                  stroke = T,
+                  fillOpacity = 1,
+                  fillColor = "red")
+    return(p)
+  })
+
+  # Data_Tree Map  #####
+
+  int_mig_sub_Tree = reactive({
+
+    layerID_clicked3=layerID_clicked3()
+
+    ISO_NODE_s = admin_poly_modelled@data$ISO_NODE[layerID_clicked3]  # clicked admin
+
+    int_mig_sub_Tree=int_mig_sub %>%
+      mutate(ISO_NODEJ=paste0(ISOJ,"_",NODEJ))%>%
+      filter(ISO_NODEJ==ISO_NODE_s) %>%
+      mutate(ISO_NODE = paste0(ISOI,"_",NODEI)) %>%
+      group_by(ISOI) %>%
+      summarise(INTMIGIJ=mean(INTMIGIJ)) %>%
+      filter( INTMIGIJ > 0) %>%
+      mutate(ISO_NodeJ = ISO_NODE_s) %>%
+      select(ISO_NodeJ,ISOI, INTMIGIJ ) %>%
+      collect()
+
+    int_mig_sub_Tree$Origin_Name = countrycode(int_mig_sub_Tree$ISOI,"iso3c","country.name")
+
+    int_mig_sub_Tree=as.data.frame(int_mig_sub_Tree)
+
+    return(int_mig_sub_Tree)
+  })
+
+
+  # Treemap #####
+
+  output$Treemap = renderPlot({
+
+    int_mig_sub_Tree_collected=int_mig_sub_Tree()
+    plot_t=treemap(int_mig_sub_Tree_collected,
+                   index="Origin_Name",
+                   vSize = "INTMIGIJ",
+                   position.legend = "right",
+                   fontsize.labels = 16)
+
+    return(plot_t)
+  })
+
+
 })
+
