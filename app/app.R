@@ -12,6 +12,7 @@ library(tidygraph)
 library(stringr)
 library(rgdal)
 library(countrycode)
+library(treemap)
 
 rm(list = ls())
 
