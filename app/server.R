@@ -795,7 +795,7 @@ server <- shinyServer(function(input, output, session) {
     )
     chord
   })
-
+  
   # # title_map3_data ####
   
   
@@ -825,27 +825,27 @@ server <- shinyServer(function(input, output, session) {
     ))
     
   })
-
+  
   ## ISO_NODE_clicked 3  ####
   layerID_clicked3=reactive({
     event=input$map3_shape_click
-
+    
     if(is.null(event)){
       event<-data.frame("id"=200)
     }
-
+    
     layerID_clicked3=event$id
-
+    
     return(layerID_clicked3)
-
+    
   })
-
   
-   ## Data_map3
+  
+  ## Data_map3
   admin_data_selected=reactive({
-
+    
     ISO_NODE_s=admin_poly_modelled@data$ISO_NODE[layerID_clicked3()] # clicked ISO_NODE
-
+    
     int_mig_sub_NODE=int_mig_sub%>% # migration data for the clicked ISO_NODE
       mutate(ISO_NODEJ=paste0(ISOJ,"_",NODEJ))%>%
       filter(ISO_NODEJ==ISO_NODE_s) %>%
@@ -853,19 +853,19 @@ server <- shinyServer(function(input, output, session) {
       select(ISO_NODEJ,ISO_NODE, INTMIGIJ) %>%
       arrange(desc(INTMIGIJ)) %>%
       collect()
-
+    
     admin_data_selected=admin_poly_modelled
-
-
+    
+    
     admin_data_selected@data=admin_data_selected@data%>%    #merging the specific region to the aggregate shape file
       mutate(ISO_NODE=as.character(ISO_NODE))%>%
       left_join(int_mig_sub_NODE,
                 by=c("ISO_NODE"))
-
+    
     return(admin_data_selected)
-
+    
   })
-
+  
   # Map3: Base Map
   Selected_Node=reactive({
     ISO_NODE_s=admin_poly_modelled@data$ISO_NODE[layerID_clicked3()]
@@ -873,25 +873,25 @@ server <- shinyServer(function(input, output, session) {
                          admin_poly_modelled@data$ISO_NODE==ISO_NODE_s)
     return(Selected_Node)
   })
-
-
+  
+  
   # map 3 #####
-
+  
   observe({
-
+    
     print(admin_poly_modelled@data$ISO_NODE[layerID_clicked3()])
-
+    
     Selected_Node_dta=Selected_Node()
     admin_data_selected_dta=admin_data_selected()
-
-
+    
+    
     mypalette = colorNumeric(palette="Greens", domain=admin_poly_modelled@data$INTMIGIJ, na.color="transparent")
     Hovertext=paste("ISO_Node: ", admin_poly_modelled@data$ISO_NODE,"<br/>",
                     "Outward Migration to Dest: ",admin_poly_modelled@data$INTMIGIJ, sep="") %>%
-    lapply(htmltools::HTML)
-
-
-
+      lapply(htmltools::HTML)
+    
+    
+    
     p=leafletProxy('map3')%>%
       clearShapes()  %>%
       addPolygons(data=admin_data_selected_dta,
@@ -906,15 +906,15 @@ server <- shinyServer(function(input, output, session) {
                   fillColor = "red")
     return(p)
   })
-
+  
   # Data_Tree Map  #####
-
+  
   int_mig_sub_Tree = reactive({
-
+    
     layerID_clicked3=layerID_clicked3()
-
+    
     ISO_NODE_s = admin_poly_modelled@data$ISO_NODE[layerID_clicked3]  # clicked admin
-
+    
     int_mig_sub_Tree=int_mig_sub %>%
       mutate(ISO_NODEJ=paste0(ISOJ,"_",NODEJ))%>%
       filter(ISO_NODEJ==ISO_NODE_s) %>%
@@ -925,29 +925,28 @@ server <- shinyServer(function(input, output, session) {
       mutate(ISO_NodeJ = ISO_NODE_s) %>%
       select(ISO_NodeJ,ISOI, INTMIGIJ ) %>%
       collect()
-
+    
     int_mig_sub_Tree$Origin_Name = countrycode(int_mig_sub_Tree$ISOI,"iso3c","country.name")
-
+    
     int_mig_sub_Tree=as.data.frame(int_mig_sub_Tree)
-
+    
     return(int_mig_sub_Tree)
   })
-
-
+  
+  
   # Treemap #####
-
+  
   output$Treemap = renderPlot({
-
+    
     int_mig_sub_Tree_collected=int_mig_sub_Tree()
     plot_t=treemap(int_mig_sub_Tree_collected,
                    index="Origin_Name",
                    vSize = "INTMIGIJ",
                    position.legend = "right",
                    fontsize.labels = 16)
-
+    
     return(plot_t)
   })
-
-
+  
+  
 })
-

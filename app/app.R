@@ -11,6 +11,7 @@ library(igraph)
 library(tidygraph)
 library(stringr)
 library(rgdal)
+library(countrycode)
 
 rm(list = ls())
 

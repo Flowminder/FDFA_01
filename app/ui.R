@@ -160,7 +160,7 @@ ui <- shinyUI(navbarPage("Gender-disaggregated Migration Movements",
                              column(6,
                                     fluidRow(leaflet_map1,
                                              widget_panel1)
-                                    ),
+                             ),
                              column(6,
                                     fluidRow(country_summary),
                                     fluidRow(country_female_pie),
@@ -183,29 +183,28 @@ ui <- shinyUI(navbarPage("Gender-disaggregated Migration Movements",
                              column(6,
                                     fluidRow(
                                       title_map2_html,
-                                             leaflet_map2,
-                                             widget_panel2)
-                                    ),
+                                      leaflet_map2,
+                                      widget_panel2)
+                             ),
                              column(6,
                                     fluidRow(chorddiagOutput_1),
                                     fluidRow(dropdown_gender5))
-                             ),
+                           ),
                            fluidRow(
                              column(6,
                                     fluidRow(
                                       title_map3_html,
-                                             leaflet_map3)
-                                    )),
+                                      leaflet_map3)
+                             )),
                            fluidRow(
                              column(12,
                                     fluidRow(
                                       render_treemap1
                                     )
+                             )
+                             
+                             
                            )
-                              
-                           
-                           )
+                         )
 )
 )
-)
-
