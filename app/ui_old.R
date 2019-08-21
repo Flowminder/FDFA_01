@@ -8,7 +8,7 @@ panel_style=tags$head(tags$style(HTML('#PANEL {background-color: rgba(190,190,19
 
 # Tab 1
 
-# Headings and dividors ####
+# Headings and dividors 
 title1_html=htmlOutput("title1")
 
 title2_html=htmlOutput("title2")
@@ -24,7 +24,7 @@ line_1_html = HTML("<hr color='black' >",
 
 leaflet_map1=leafletOutput("map1",width="100%",height="800px")
 
-dropdown_direction1=selectInput("direction1",
+dropdown_direction1=selectInput("direction1", 
                                 label = "Direction",
                                 choices = c("Emigration"="emigration",
                                             "Immigration"="immigration",
@@ -33,7 +33,7 @@ dropdown_direction1=selectInput("direction1",
                                             "Total migration (in and out)"="total_migration"),
                                 selected = "emigration")
 
-dropdown_gender1=selectInput("gender1",
+dropdown_gender1=selectInput("gender1", 
                              label = "Gender",
                              choices = c("Total (females and males)"="total",
                                          "Females"="females",
@@ -42,7 +42,7 @@ dropdown_gender1=selectInput("gender1",
                                          "Males as percent of total"="males_perc"),
                              selected = "total")
 
-dropdown_basemap1=selectInput("base_map1",
+dropdown_basemap1=selectInput("base_map1", 
                               label = "Base map",
                               choices = c("Open street map"="OSM",
                                           "Population density"="pop_dens"),
@@ -62,13 +62,13 @@ widget_panel1=absolutePanel(top = 50, left = 15,
 title_map2_html=htmlOutput("title_map2", align="centre")
 leaflet_map2=leafletOutput("map2",width="100%",height="800px")
 
-dropdown_direction2=selectInput("direction2",
+dropdown_direction2=selectInput("direction2", 
                                 label = "Direction",
                                 choices = c("Emigration"="emigration",
                                             "Immigration"="immigration"),
                                 selected = "emigration")
 
-dropdown_gender2=selectInput("gender2",
+dropdown_gender2=selectInput("gender2", 
                              label = "Gender",
                              choices = c("Total (females and males)"="total",
                                          "Females"="females",
@@ -77,7 +77,7 @@ dropdown_gender2=selectInput("gender2",
                                          "Males as percent of total"="males_perc"),
                              selected = "total")
 
-dropdown_basemap2=selectInput("base_map2",
+dropdown_basemap2=selectInput("base_map2", 
                               label = "Base map",
                               choices = c("Open street map"="OSM",
                                           "Population density"="pop_dens"),
@@ -109,33 +109,33 @@ country_summary=htmlOutput("country_summary", align="centre")
 country_female_pie=plotlyOutput("country_female_pie")
 
 top_10_country_bar=plotlyOutput("top_10_country_bar")
-top_10_country_dropdown=selectInput("top_10_country_dropdown",
+top_10_country_dropdown=selectInput("top_10_country_dropdown", 
                                     label = "",
                                     choices = c("Number"="number",
                                                 "Proportion of destination population"="perc"),
                                     selected = "number")
 
 top_10_country_EM_bar=plotlyOutput("top_10_country_EM_bar")
-top_10_country_EM_dropdown=selectInput("top_10_country_EM_dropdown",
+top_10_country_EM_dropdown=selectInput("top_10_country_EM_dropdown", 
                                        label = "",
                                        choices = c("Number"="number",
                                                    "Proportion of origin population"="perc"),
                                        selected = "number")
 
-dropdown_gender3=selectInput("gender3",
+dropdown_gender3=selectInput("gender3", 
                              label = "",
                              choices = c("Total (females and males)"="total",
                                          "Females"="females",
                                          "Males"="males"),
                              selected = "total")
-dropdown_gender4=selectInput("gender4",
+dropdown_gender4=selectInput("gender4", 
                              label = "",
                              choices = c("Total (females and males)"="total",
                                          "Females"="females",
                                          "Males"="males"),
                              selected = "total")
 
-dropdown_gender5=selectInput("gender5",
+dropdown_gender5=selectInput("gender5", 
                              label = "",
                              choices = c("Total (females and males)"="total",
                                          "Females"="females",
@@ -154,65 +154,63 @@ render_treemap1 =  plotOutput("Treemap", width = "80%", height = "700px")
 
 
 
+
+# UI structure ####
+
 ui <- shinyUI(navbarPage("Gender-disaggregated Migration Movements",
-                         tabsetPanel(
-                         tabPanel("Global Summaries",
-                                  fluidPage(
-                                    # panel_style,
-                                    fluidRow(
-                                      column(12,
-                                             title1_html),
-                                      div(style = "height:80px")),
-                                    fluidRow(
-                                      column(4,
-                                             global_figures,
-                                             global_female_pie),
-                                      column(4,
-                                             top_10_total_bar,
-                                             checkbox_top_10_total_perc),
-                                      column(4,
-                                             top_10_females_bar,
-                                             top_10_females_perc)),
-                                        fluidRow(
-                                        column(12,
-                                               fluidRow(leaflet_map1,
-                                                        widget_panel1)
-                                        )
-                                    ))),
-                         tabPanel("Country Profile: Total",
-                                  # panel_style,
-                                  # fluidRow(
-                                  #   column(12,
-                                  #          title2_html),
-                                  #   div(style = "height:80px")),
-                                  fluidRow(
-                                    # column(6,
-                                    #        fluidRow(leaflet_map1,
-                                    #                 widget_panel1)
-                                    # ),
-                                    column(6,
-                                           fluidRow(country_summary),
-                                           fluidRow(country_female_pie),
-                                           tabBox(
-                                             title = "Top regions ranked by:", width = NULL,
-                                             
-                                             tabPanel("Immigration",
-                                                      fluidRow(top_10_country_bar),
-                                                      fluidRow(column(6,top_10_country_dropdown),
-                                                               column(6,dropdown_gender3))
-                                             ),
-                                             tabPanel("Emigration",
-                                                      fluidRow(top_10_country_EM_bar,
-                                                               top_10_country_EM_dropdown,
-                                                               dropdown_gender4))
-                                           ))
-                                  )),
-                         tabPanel("Country Profile: Origins and Destinations",
-                                  # panel_style,
+                         
+                         fluidPage(
+                           panel_style,
                            fluidRow(
-                           column(12,
-                                  title3_html,
-                                  div(style = "height:80px"))),
+                             column(12,
+                                    title1_html),
+                             div(style = "height:80px")),
+                           fluidRow(
+                             column(4,
+                                    global_figures,
+                                    global_female_pie),
+                             column(4,
+                                    top_10_total_bar,
+                                    checkbox_top_10_total_perc),
+                             column(4,
+                                    top_10_females_bar,
+                                    top_10_females_perc)
+                           ),
+                           fluidRow(
+                             column(12,
+                                    line_1_html))
+                             ,
+                           fluidRow(
+                             column(12,
+                                    title2_html),
+                             div(style = "height:80px")),
+                           fluidRow(
+                             column(6,
+                                    fluidRow(leaflet_map1,
+                                             widget_panel1)
+                             ),
+                             column(6,
+                                    fluidRow(country_summary),
+                                    fluidRow(country_female_pie),
+                                    tabBox(
+                                      title = "Top regions ranked by:", width = NULL,
+                                      
+                                      tabPanel("Immigration",
+                                               fluidRow(top_10_country_bar),
+                                               fluidRow(column(6,top_10_country_dropdown),
+                                                        column(6,dropdown_gender3))
+                                      ),
+                                      tabPanel("Emigration",
+                                               fluidRow(top_10_country_EM_bar,
+                                                        top_10_country_EM_dropdown,
+                                                        dropdown_gender4))
+                                    )
+                             )
+                           ),
+                           fluidRow(
+                             column(12,
+                                    title3_html,
+                                    div(style = "height:80px"))),
                            fluidRow(
                              column(6,
                                     fluidRow(
@@ -236,6 +234,17 @@ ui <- shinyUI(navbarPage("Gender-disaggregated Migration Movements",
                                       render_treemap1
                                     )
                              )
-                           ))
-                         )))
-                                  
+                             
+                             
+                           )
+                         )
+)
+)
+
+
+
+
+
+
+
+
