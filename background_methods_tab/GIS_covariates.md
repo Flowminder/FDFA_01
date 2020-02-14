@@ -1,11 +1,13 @@
 Geographic Information System (GIS) Covariates
 ----------------------------------------------
 
-A set of 8 geospatial datasets of representing pull and push migration
-factors, known to influence internal migration (Garcia et al.
+In order to estimate internal migration movements for countries with no
+available census data on internal migration, a set of 8 geospatial
+datasets representing pull and push migration factors, known to
+influence internal migration (Garcia et al.
 <a href="https://eprints.soton.ac.uk/367712/" target="_blank">2014</a>;
 Sorichetta et al,
-<a href="https://www.nature.com/articles/sdata201666" target="_blank">2016</a>),
+<a href="https://www.nature.com/articles/sdata201666" target="_blank">2016</a>)
 were used to improve the fit and prediction power of the gravity model
 originally proposed by Zipf
 (<a href="https://www.jstor.org/stable/2087063?seq=1" target="_blank">1946</a>).

@@ -19,7 +19,7 @@ The 40 Global South countries with internal migration data harmonised by IMPUMS-
 
 
 <center>
-```{r census-year-LAC, echo=FALSE, warning=FALSE,fig.cap="Map 1: Study area split into countries with and without IPUMSI census data", out.width = '80%'}
+```{r census-year-LAC, echo=FALSE, warning=FALSE,fig.cap="Map 1: Study area split into countries with and without IPUMSI census data", out.width = '100%'}
 
 knitr::include_graphics("Study_area.png")
 
@@ -55,14 +55,91 @@ Informed by our data structure, we tested generalised linear models and generali
 
 The random effect was useful in our models to account for the differences between countries that are not captured by the rest of our covariates but that are likely to influence internal migration patterns (e.g. the ethnic homogeneity/heterogeneity of a country). We generally included in the models both random intercepts and random slopes i.e. both the baseline and the relationship between migrant numbers and covariates varied for each country.
 
-We then built increasingly complex models by starting with the covariates with the highest R2 and adding new covariates in decreasing order of their R2 value. At each step we calculated the R2 and the Akaike Information Criterion (AIC) of the model. We chose the models that performed best based on these two criteria  and then further compared these models through out of sample cross-validation. We used the same procedure described above in which we trained the model on the data for 39 countries and used the trained model to predict the gender-disaggregated migration flows for the 40th country in the dataset. The generalised zero-inflated mixed models with Poisson distributions showed a better fit and better predictions compared to the other models with an average squared rank correlation coefficient R2 of 77% and 76% for the female and male migration model, respectively. This means that 77% and 76% of the variation in the observed data on migration movements are explained by the models. The predictions were uniformely good for most countries except Venezuela (see Figure 1 and 2).
+We then built increasingly complex models by starting with the covariates with the highest R2 and adding new covariates in decreasing order of their R2 value. At each step we calculated the R2 and the Akaike Information Criterion (AIC) of the model. We chose the models that performed best based on these two criteria  and then further compared these models through out of sample cross-validation. We used the same procedure described above in which we trained the model on the data for 39 countries and used the trained model to predict the gender-disaggregated migration flows for the 40th country in the dataset. The generalised zero-inflated mixed models with Poisson distributions showed a better fit and better predictions compared to the other models with an average squared rank correlation coefficient R2 of 61% and 59% for the female and male migration model, respectively. This means that 61% and 59% of the variation in the observed data on migration movements are explained by the models. The predictions were uniformely good for most countries except Venezuela (see Figure 1 and 2).
 
 <center>
-```{r female-model, echo=FALSE, warning=FALSE,fig.cap="Figure 1: Female migration, goodness of fit as measured by the average of the squared rank correlation coefficient (R-squared). A value of 76% means that 76% of the variation in the observed data on female migration movements is explained by the model.", out.width = '50%'}
+```{r female-model, echo=FALSE, warning=FALSE,message=FALSE, fig.cap="Figure 1: Female migration, goodness of fit as measured by the average of the squared rank correlation coefficient (R-squared). A value of 60% means that 60% of the variation in the observed data on female migration movements is explained by the model.", out.width='600px', fig.show='hold',align='center'}
+
 knitr::include_graphics("female_r2.png")
+# 
+# library(plotly)
+# library(dplyr)
+# setwd("C:/Users/Xavier Vollenweider/Documents/Flowminder/Migration_FDFA/code/FDFA_01_dev_v4/")
+# #load the data
+# r2_mae_internal=read.csv("data/r2_mae_internal.csv")
+# admin_names=read.csv("data/admin_names_final.csv")
+# 
+# # add countries name
+# r2_mae_internal=r2_mae_internal%>%
+#   rename("ISO"="countries")%>%
+#   select(-X)%>%
+#   mutate(Sex=ifelse(Sex=="F","Female model","Male model"))
+# 
+# countries_names=admin_names%>%
+#   distinct(COUNTRY_NAME,ISO,CONT)
+# 
+# data2plot=r2_mae_internal%>%
+#   left_join(countries_names,
+#             by="ISO")%>%
+#   mutate(CONT=as.character(CONT),
+#          CONT=ifelse(CONT=="AFR","Africa",CONT),
+#          CONT=ifelse(CONT=="ASI","Asia and Oceania",CONT),
+#          CONT=ifelse(CONT=="LAC","Latin America and Caribbean",CONT))
+# 
+# #summary
+# # data2plot%>%
+# #   group_by(Sex)%>%
+# #   summarise(mean_R2=mean(R2))
+# 
+# # plot parameters
+# m <- list( # plot margins
+#   l = 50,
+#   r = 50,
+#   b = 100,
+#   t = 100,
+#   pad = 4
+# )
+# 
+# # plot r2
+# p=plot_ly(data=data2plot%>%
+#           filter(Sex=="Female model")%>%
+#           arrange(CONT,COUNTRY_NAME)%>%
+#           mutate(COUNTRY_NAME_f=factor(1:40,
+#                                        labels=COUNTRY_NAME)),
+#         x=~COUNTRY_NAME_f,
+#         y=~R2,
+#         color=~CONT,
+#         type="scatter",
+#         mode="markers")%>%
+#   layout(title="Female Migration Model\n(Average R-squared 61%)",
+#          xaxis=list(title="",tickangle=45),
+#          yaxis=list(title="R-squared",tickformat = "%"),
+#          margin=m,
+#          legend = list(orientation = "h",   
+#                        x = 0,
+#                        y=-0.5))
+# return(p)
 ```
 
-```{r male-model, echo=FALSE, warning=FALSE,fig.cap="Figure 2: Male migration, goodness of fit as measured by the average of the squared rank correlation coefficient (R-squared). A value of 77% means that 77% of the variation in the observed data on female migration movements is explained by the model.", out.width = '50%'}
+```{r male-model, echo=FALSE, warning=FALSE,message=FALSE, fig.cap="Figure 2: Male migration, goodness of fit as measured by the average of the squared rank correlation coefficient (R-squared). A value of 60% means that 60% of the variation in the observed data on male migration movements is explained by the model.", out.width='600px', fig.show='hold',align='center'}
 knitr::include_graphics("male_r2.png")
+# 
+# plot_ly(data=data2plot%>%
+#           filter(Sex=="Male model")%>%
+#           arrange(CONT,COUNTRY_NAME)%>%
+#           mutate(COUNTRY_NAME_f=factor(1:40,
+#                                        labels=COUNTRY_NAME)),
+#         x=~COUNTRY_NAME_f,
+#         y=~R2,
+#         color=~CONT,
+#         type="scatter",
+#         mode="markers")%>%
+#   layout(title="Male Migration Model\n(Average R-squared 59%)",
+#          xaxis=list(title="",tickangle=45),
+#          yaxis=list(title="R-squared",tickformat = "%"),
+#          margin=m,
+#          legend = list(orientation = "h",   
+#                                              x = 0,
+#                        y=-0.5))
 ```
 </center>

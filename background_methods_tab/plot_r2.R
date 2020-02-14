@@ -29,14 +29,13 @@ data2plot%>%
 # plot parameters
 m <- list( # plot margins
   l = 50,
-  r = 100,
-  b = 200,
+  r = 50,
+  b = 50,
   t = 100,
   pad = 4
 )
-
 # plot r2
-plot_ly(data=data2plot%>%
+p=plot_ly(data=data2plot%>%
           filter(Sex=="Female model")%>%
           arrange(CONT,COUNTRY_NAME)%>%
           mutate(COUNTRY_NAME_f=factor(1:40,
@@ -46,14 +45,15 @@ plot_ly(data=data2plot%>%
         color=~CONT,
         type="scatter",
         mode="markers")%>%
-  layout(title="Female migration model",
+  layout(title="Female Migration Model\n(Average R-squared 61%)",
          xaxis=list(title="",tickangle=45),
          yaxis=list(title="R-squared",tickformat = "%"),
          margin=m,
-         legend = list(orientation = "h",   
-                       x = 0.5,
-                       y=-0.8))
+         legend = list(orientation = "h",
+                       x = 0,
+                       y=-0.2))
 
+p
 plot_ly(data=data2plot%>%
           filter(Sex=="Male model")%>%
           arrange(CONT,COUNTRY_NAME)%>%
@@ -64,14 +64,13 @@ plot_ly(data=data2plot%>%
         color=~CONT,
         type="scatter",
         mode="markers")%>%
-  layout(title="Male migration model",
+  layout(title="Male Migration Model\n(Average R-squared 59%)",
          xaxis=list(title="",tickangle=45),
          yaxis=list(title="R-squared",tickformat = "%"),
          margin=m,
-         legend = list(orientation = "h",   
-                       x = 0.5,
-                      y=-0.8))
-
+         legend = list(orientation = "h",
+                                             x = 0,
+                       y=-0.5))
 
 
 # plot MAE

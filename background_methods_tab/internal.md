@@ -39,7 +39,7 @@ IMPUMS-I are shown on the *map 1* and listed the final report (see
 here).
 
 <center>
-<img src="Study_area.png" alt="Map 1: Study area split into countries with and without IPUMSI census data" width="80%" />
+<img src="Study_area.png" alt="Map 1: Study area split into countries with and without IPUMSI census data" width="100%" />
 <p class="caption">
 Map 1: Study area split into countries with and without IPUMSI census
 data
@@ -167,26 +167,26 @@ gender-disaggregated migration flows for the 40th country in the
 dataset. The generalised zero-inflated mixed models with Poisson
 distributions showed a better fit and better predictions compared to the
 other models with an average squared rank correlation coefficient R2 of
-77% and 76% for the female and male migration model, respectively. This
-means that 77% and 76% of the variation in the observed data on
+61% and 59% for the female and male migration model, respectively. This
+means that 61% and 59% of the variation in the observed data on
 migration movements are explained by the models. The predictions were
 uniformely good for most countries except Venezuela (see Figure 1 and
 2).
 
 <center>
-<img src="female_r2.png" alt="Figure 1: Female migration, goodness of fit as measured by the average of the squared rank correlation coefficient (R-squared). A value of 76% means that 76% of the variation in the observed data on female migration movements is explained by the model." width="50%" />
+<img src="female_r2.png" alt="Figure 1: Female migration, goodness of fit as measured by the average of the squared rank correlation coefficient (R-squared). A value of 60% means that 60% of the variation in the observed data on female migration movements is explained by the model." width="600px" />
 <p class="caption">
 Figure 1: Female migration, goodness of fit as measured by the average
-of the squared rank correlation coefficient (R-squared). A value of 76%
-means that 76% of the variation in the observed data on female migration
+of the squared rank correlation coefficient (R-squared). A value of 60%
+means that 60% of the variation in the observed data on female migration
 movements is explained by the model.
 </p>
 
-<img src="male_r2.png" alt="Figure 2: Male migration, goodness of fit as measured by the average of the squared rank correlation coefficient (R-squared). A value of 77% means that 77% of the variation in the observed data on female migration movements is explained by the model." width="50%" />
+<img src="male_r2.png" alt="Figure 2: Male migration, goodness of fit as measured by the average of the squared rank correlation coefficient (R-squared). A value of 60% means that 60% of the variation in the observed data on male migration movements is explained by the model." width="600px" />
 <p class="caption">
 Figure 2: Male migration, goodness of fit as measured by the average of
-the squared rank correlation coefficient (R-squared). A value of 77%
-means that 77% of the variation in the observed data on female migration
+the squared rank correlation coefficient (R-squared). A value of 60%
+means that 60% of the variation in the observed data on male migration
 movements is explained by the model.
 </p>
 

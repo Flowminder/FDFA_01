@@ -211,18 +211,35 @@ ui =dashboardPage(
       )
       ,tabItem("method",
                tabsetPanel(type = "tabs",
-                           tabPanel("Overview", includeMarkdown("background_methods_tab/background_methods_tab.md")),
-                           tabPanel("Internal migration", includeMarkdown("background_methods_tab/internal.md")),
-                           tabPanel("International migration", includeMarkdown("background_methods_tab/international.md")),
-                           tabPanel("GIS covariates", includeMarkdown("background_methods_tab/GIS_covariates.md"))
+                           tabPanel("Overview", includeMarkdown("background_methods_tab/background_methods_tab.md")), #
+                           tabPanel("Internal migration",  includeMarkdown("background_methods_tab/internal.md")),
+                           tabPanel("International migration", includeMarkdown("background_methods_tab/international.md")), #
+                           tabPanel("GIS covariates", includeMarkdown("background_methods_tab/GIS_covariates.md")) #
                            
                )
       )
     )
   )
 )  
+
 # Server ####
 server <-  function(input, output) {
+  
+  # # Background tab ####
+  # output$overview_tab=renderUI({
+  #   includeHTML("background_methods_tab/background_methods_tab.html")
+  # })
+  # 
+  # output$internal_tab=renderUI({
+  #   includeHTML("background_methods_tab/internal.html")
+  # })
+  # output$international_tab=renderUI({
+  #   includeHTML("background_methods_tab/international.html")
+  # })
+  # 
+  # output$GIS_covariates=renderUI({
+  #   includeHTML("background_methods_tab/GIS_covariates.html")
+  # })
   
   # country_admin_clicked_f ####
   country_admin_clicked_f=reactive({
