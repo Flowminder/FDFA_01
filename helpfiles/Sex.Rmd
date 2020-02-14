@@ -1,0 +1,11 @@
+---
+title: "Sex"
+author: "Xavier Vollenweider"
+date: "31 January 2020"
+output: md_document
+---
+
+## Sex
+
+***
+This drop-down menu let you filter the data according to the sex of the migrants. 

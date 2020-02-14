@@ -1,0 +1,23 @@
+---
+title: "Type"
+author: "Xavier Vollenweider"
+date: "31 January 2020"
+output: md_document
+
+---
+## Type
+
+***
+This drop-down menu let you choose the type of migration **estimates** to show: 
+
+*	  `International`: An *international* migrant is defined here as a person who has **changed country of residence within 5 years**. For instance, a person having migrated from country *A* to country *B* and having resided less than 2 years in country *B* is counted as an international migrant, but a person having migrated 10 years ago in country *B* is not considered as a migrant anymore.  
+*	  `Internal`: Similarly, an *internal* migrant is defined here as a person who has **changed administrative unit of residence within 5 years prior to census**. 
+
+
+###Data sources and methods
+The migration **estimates** for *international* and *internal* movements come from two different models and data sources: 
+
+*	  `International`: ADRI database (UNDESA): Iterative Proportional Fitting to disaggregate national estimates to subnational level
+*	  `Internal`: IMPUMSI database (censuses, 40 countries): statistical model fed by Remote sensed and other geographic data to out-predict internal migration in countries where census data on migration is not available
+
+These migration figures are **estimates** of international and internal migration of 2010. These figures are not meant to represent the actual count of migrants. See the tab *Background & methods* for more information.
