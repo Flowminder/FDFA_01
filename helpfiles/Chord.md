@@ -14,13 +14,10 @@ size of the arc is proportional to the importance of the flow."
 Data to Viz</a>)*
 
 Larger is the arc, larger is the migration movement from one entitiy to
-the next. Two filters are applied to the data:
+the next. One filter can be applied to the data:
 
--   The dropdown menu `Number of relations` allows the user to filter
-    the maximum number of relations per entity (rnked by order of
-    importance)
--   The slider widget `Maximum number of relations` determine the number
-    of relations to draw out of these pre-selected relations.
+-   The widget `Maximum number of relations` determines the number of
+    relations to draw.
 
 ### Data sources and methods
 
