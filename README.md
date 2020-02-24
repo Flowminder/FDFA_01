@@ -24,11 +24,11 @@ mapping and visualization of this new dataset. It is deployed
 <a href="https://gravier.shinyapps.io/fdfa_01_dev_v4/" target="_blank">here</a>.
 
 The dataset has been developped by Alessandro Sorichetta
-(PI)<sup>1</sup>, Andrew J. Tatem (PI) <sup>1</sup> <sup>3</sup>, Silvia
-Ceausu <sup>1</sup>, Dorothea Woods <sup>1</sup> <sup>2</sup>, Chigozie
-E. Utazi <sup>1</sup> and Guy Abel <sup>4</sup>. The dashboard has been
-developped by Xavier Vollenweider <sup>3</sup>. <br> <br> <br>
-<sup>1</sup> WorldPop, University of Southampton, UK.<br> <sup>2</sup>
-GeoData, University of Southampton, UK. <br> <sup>3</sup> Flowminder
-Foundation, Switzerland. <br> <sup>4</sup> ADRI, Shanghai University,
-China. <br>
+(PI)<sup>1</sup>, Andrew J. Tatem (PI)<sup>1</sup> <sup>3</sup>, Silvia
+Ceausu<sup>1</sup>, Dorothea Woods<sup>1</sup> <sup>2</sup>, Chigozie E.
+Utazi<sup>1</sup> and Guy Abel<sup>4</sup>. The dashboard has been
+developped by Xavier Vollenweider<sup>3</sup> with help from Visvanathan
+Subramaniam<sup>3</sup>. <br> <br> <br> <sup>1</sup> WorldPop,
+University of Southampton, UK.<br> <sup>2</sup> GeoData, University of
+Southampton, UK. <br> <sup>3</sup> Flowminder Foundation, Switzerland.
+<br> <sup>4</sup> ADRI, Shanghai University, China. <br>

@@ -14,7 +14,7 @@ The new dataset is available <a href="ftp://ftp.worldpop.org.uk/tmp/FDFA_Subnati
 This repository hosts the code of the dashboard providing interactive mapping and visualization of this new dataset. It is deployed <a href="https://gravier.shinyapps.io/fdfa_01_dev_v4/" target="_blank">here</a>.
 
 
-The dataset has been developped by Alessandro Sorichetta (PI)^1^, Andrew J. Tatem (PI) ^1^ ^3^, Silvia Ceausu ^1^, Dorothea Woods ^1^ ^2^, Chigozie E. Utazi ^1^ and Guy Abel ^4^. The dashboard has been developped by Xavier Vollenweider ^3^.
+The dataset has been developped by Alessandro Sorichetta (PI)^1^, Andrew J. Tatem (PI)^1^ ^3^, Silvia Ceausu^1^, Dorothea Woods^1^ ^2^, Chigozie E. Utazi^1^ and Guy Abel^4^. The dashboard has been developped by Xavier Vollenweider^3^ with help from Visvanathan Subramaniam^3^.
 <br>
 <br>
 <br>
