@@ -16,9 +16,8 @@ consistent and harmonized dataset of sex-disaggregated migration
 movements estimates at the subnational level within and between all low-
 and middle-income countries.
 
-The new dataset is available
-<a href="ftp://ftp.worldpop.org.uk/tmp/FDFA_Subnational_MigrationEstimates/" target="_blank">at
-this ftp link</a>.
+The new dataset is available at this link:
+<ftp://ftp.worldpop.org.uk/tmp/FDFA_Subnational_MigrationEstimates/>
 
 This repository hosts the code of the dashboard providing interactive
 mapping and visualization of this new dataset. It is deployed
