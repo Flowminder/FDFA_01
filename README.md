@@ -17,7 +17,8 @@ movements estimates at the subnational level within and between all low-
 and middle-income countries.
 
 The new dataset is available
-<a href="ftp://ftp.worldpop.org.uk/tmp/FDFA_Subnational_MigrationEstimates/" target="_blank">here</a>.
+<a href="ftp://ftp.worldpop.org.uk/tmp/FDFA_Subnational_MigrationEstimates/" target="_blank">at
+this ftp link</a>.
 
 This repository hosts the code of the dashboard providing interactive
 mapping and visualization of this new dataset. It is deployed
