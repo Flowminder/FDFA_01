@@ -7,7 +7,7 @@ protect and assist migrant populations, and monitor progress towards the
 achievement of migration-relevant targets in the Sustainable Development
 Goals (SDGs). This is particularly true for migration movements across
 the Global South, international migration movements at the
-subnational-unit level (i.e. between spatial units located in different
+subnational-unit level (i.e. between spatial units located in different
 countries), and migration data disaggregated by basic characteristic
 such as sex.
 
@@ -26,36 +26,73 @@ The dataset is available for 121 countries of the Global South shown on
 Map <span id="countries-covered">1</span>.[1]
 
 <center>
+
 <img src="Global_South_Covered.png" alt="Map 1: Study area" width="80%" />
 <p class="caption">
 Map 1: Study area
 </p>
 
 </center>
+
 Definitions
 -----------
 
 ### *Migration*
 
-An *international* migrant is defined here as a person who has **changed
-country of residence within 5 years**. For instance, a person having
-migrated from country *A* to country *B* and having resided less than 2
-years in country *B* is counted as an international migrant, but a
-person having migrated 10 years ago in country *B* is not considered as
-a migrant anymore.
+Following Dennett & Wilson (2013), internal “interregional” migration
+flows are defined here as the migration flows between subnational
+administrative units located within the same country (internal migration
+flows). Similarly, international “interregional” migration flows are
+defined here as the migration flows between subnational administrative
+units located in different countries (international migration flows at
+the subnational level).
 
-Similarly, an *internal* migrant is defined here as a person who has
-**changed administrative unit of residence within 5 years prior to
-census**.
+An internal migrant is defined here as an individual who has a different
+administrative unit of usual residence, within a given country, during
+the census year in comparison to five years prior to the census.
+Sex-disaggregated internal “interregional” migration flows, mostly
+between Level 1 administrative units, were estimated using 5-year
+migration data for 40 countries extracted from census microdata
+available through the IPUMSI database (Ceaușu et al., in preparation).
+For each country, the use of migration data collected during the 2010
+round of population and housing censuses (spanning the period 2005 to
+2014) was prioritized in order to produce estimates that are
+representative of the 2005-2010 period as best as possible. However,
+migration data collected during the 2000 round had to be used for 20
+countries for which migration data collected during the 2010 round were
+not available The statistical relationships identified between the
+migration flows of the 40 countries and a number of geospatial,
+environmental, and socioeconomic factors were used to estimate internal
+migration flows for a total of 121 countries.
 
-These figures provide hence medium term migration movements.
+An international migrant is defined here as an individual who has a
+different usual country of residence in 2010 compared with 2005.
+Following the extension of Azose & Raftery (2019) on the method of Abel
+and Sander (2014), country-to-country sex-disaggregated international
+flow estimates were produced from changes in UNDESA sex-disaggregated
+bilateral migrant stock data between 2005 and 2010 (2017 Revision).
+
+Finally, sex-disaggregated international “interregional” migration flow
+estimates were produced by combining the country-to-country
+sex-disaggregated international flow estimates with the corresponding
+sex-disaggregated internal “interregional” migration flow estimates
+(Ceaușu et al., in preparation). Following Dennett & Wilson (2013), this
+was done by assuming that, for each country, the subnational spatial
+distribution of internal out-migrants and in-migrants is the same as the
+subnational spatial distribution of international emigrants and
+immigrants. In other words, it was assumed that for each administrative
+unit in the country of origin, the proportion of internal out-migrants
+matches the proportion of international emigrants. Similarly, it was
+assumed that for each administrative unit in the country of destination,
+the proportion of internal in-migrants matches the proportion of
+international immigrants.
 
 ### *Administrative unit*
 
-An administrative unit is a country subdivision: a "country may be
+An administrative unit is a country subdivision: a “country may be
 divided into provinces, states, counties, cantons or other sub-units,
 which, in turn, may be divided in whole or in part into municipalities,
-counties or others"
+counties or others”
 (<a href="https://en.wikipedia.org/wiki/Administrative_division" target="_blank">Wikipedia</a>).
 
 Level 1 and 2 administrative units are used for most countries. These
@@ -70,7 +107,7 @@ estimates** for as summary of the goodness of fit of the models.
 
 These *estimates* are based on the 2000 and 2010 rounds of census (see
 Map <span id="census-year-LAC">2</span> and <span
-id="census-year-Asia">3</span>). Hence, the estimates won't capture
+id="census-year-Asia">3</span>). Hence, the estimates won’t capture
 migration out of Syria in the follow-up of the current Syrian crisis for
 instance.
 
@@ -78,6 +115,7 @@ When referring to the migration estimates, one needs to assume that the
 main drivers and directions of migration have not changed since 2010.
 
 <center>
+
 <img src="LACAfr.png" alt="Map 2: Years of censuses used in this study in Latin America, Caribbean and Africa" width="80%" />
 <p class="caption">
 Map 2: Years of censuses used in this study in Latin America, Caribbean
@@ -86,12 +124,14 @@ and Africa
 
 </center>
 <center>
+
 <img src="Asia.png" alt="Map 3: Years of censuses used in this study in Asia" width="80%" />
 <p class="caption">
 Map 3: Years of censuses used in this study in Asia
 </p>
 
 </center>
+
 Data sources and methods
 ------------------------
 
@@ -139,12 +179,37 @@ The approach can be summarised in three main steps:
     Data for the model: the ADRI database and internal migration
     estimates from step 2.
 
+Data Recommended Citation
+-------------------------
+
+Silvia Ceaușu, Dorothea Woods, Chigozie E. Utazi, Guy J. Abel, Xavier
+Vollenweider, Andrew J. Tatem, Alessandro Sorichetta (2019). Mapping
+gender-disaggregated migration movements at subnational scales in and
+between low- and middle-income countries - Funded by the Swiss
+Confederation, represented by the Federal Department of Foreign Affairs
+(FDFA), Human Security Division.
+<a href="https://dx.doi.org/10.5258/SOTON/WP00673" class="uri">https://dx.doi.org/10.5258/SOTON/WP00673</a>
+
+References
+----------
+
+Abel, G. J., & Sander, N. (2014). Quantifying Global International
+Migration Flows. Science, 343(6178), 1520–1522. Azose, J. J., & Raftery,
+A. E. (2015). Bayesian probabilistic projection of international
+migration. Demography, 52(5), 1627-1650. Ceaușu et al., (in
+preparation). Modelling sex-disaggregated internal migration flows in
+low- and middle-income countries. Ceaușu et al., (in preparation).
+Estimating sex-disaggregated interregional migration in the Global
+South. Dennett, A., & Wilson, A. (2013). A multilevel spatial
+interaction modelling framework for estimating interregional migration
+in Europe. Environment and Planning A, 45(6), 1491-1507.
+
 [1] At the time of writing (2018), the World Bank classifies 124
 countries as low- or middle-income in Africa, Asia, and Latin American
 and the Caribbean, based on their gross national income per capita. For
-five of those (i.e. American Samoa, Dominica, Marshall Islands, Nauru,
+five of those (i.e. American Samoa, Dominica, Marshall Islands, Nauru,
 and Tuvalu) no international migration data are currently available
-while for a further two of them (i.e. Kiribati and Maldives) there are
+while for a further two of them (i.e. Kiribati and Maldives) there are
 no subnational administrative units available. This leaves 117 low- and
 middle-income countries where all necessary data for modelling
 gender-disaggregated international migration at subnational level are
