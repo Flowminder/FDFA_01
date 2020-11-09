@@ -1,6 +1,10 @@
 FDFA\_01
 ========
 
+This repository hosts the code of the dashboard providing interactive
+mapping and visualization of this new dataset. It is deployed
+<a href="https://gravier.shinyapps.io/fdfa_01_dev_v4/" target="_blank">here</a>.
+
 The lack of coherent and comparable data on migration restricts our
 ability to design appropriate migration and development policies,
 protect and assist migrant populations, and monitor progress towards the
@@ -18,10 +22,6 @@ and middle-income countries.
 
 The new dataset is available at this link:
 <ftp://ftp.worldpop.org.uk/tmp/FDFA_Subnational_MigrationEstimates/>
-
-This repository hosts the code of the dashboard providing interactive
-mapping and visualization of this new dataset. It is deployed
-<a href="https://gravier.shinyapps.io/fdfa_01_dev_v4/" target="_blank">here</a>.
 
 The dataset has been developped by Alessandro Sorichetta
 (PI)<sup>1</sup>, Andrew J. Tatem (PI)<sup>1</sup> <sup>3</sup>, Silvia
