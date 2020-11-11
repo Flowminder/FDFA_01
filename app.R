@@ -19,7 +19,7 @@ library(magrittr)
 
 # set the directories ####
 # setwd("C:/Users/Xavier Vollenweider/Documents/Flowminder/Migration_FDFA/code/FDFA_01_dev_v3/")
-api_token="pk.eyJ1IjoieGF2aWVyMjAxOSIsImEiOiJjazBwcWF6M3AwMGg4M2ltZzFzMDc2eWlxIn0.n5HTSFpq5nRaMWRGTCBSLw"
+api_token="insert_your_token"
 
 # load the data ####
 sqlite = dbDriver("SQLite")
