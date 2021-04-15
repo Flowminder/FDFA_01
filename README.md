@@ -16,8 +16,8 @@ consistent and harmonized dataset of sex-disaggregated migration
 movements estimates at the subnational level within and between all low-
 and middle-income countries.
 
-The new dataset is available at this link:
-ftp://ftp.worldpop.org.uk/tmp/FDFA_Subnational_MigrationEstimates
+The new dataset is available at <a href="ftp://ftp.worldpop.org.uk/tmp/FDFA_Subnational_MigrationEstimates" target="_blank">this link</a>.
+
 
 Database citation:
 Silvia Ceaușu, Dorothea Woods, Chigozie E. Utazi, Guy J. Abel, Xavier Vollenweider, Andrew J. Tatem, Alessandro Sorichetta (2019). Mapping gender-disaggregated migration movements at subnational scales in and between low- and middle-income countries - Funded by the Swiss Confederation, represented by the Federal Department of Foreign Affairs (FDFA), Human Security Division. https://dx.doi.org/10.5258/SOTON/WP00673
